@@ -8,6 +8,7 @@ import (
 
 func main() {
 	http.HandleFunc("/", handler)
+	fmt.Println("Server is running on localhost:8000")
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
 }
 

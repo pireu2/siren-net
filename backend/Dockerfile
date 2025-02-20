@@ -5,16 +5,16 @@ FROM golang:1.24
 WORKDIR /app
 
 # Copy the Go module files
-COPY backend/go.mod backend/go.sum ./
+COPY go.mod go.sum ./
 
 # Download dependencies
 RUN go mod download
 
 # Copy the rest of the backend code
-COPY backend/ .
+COPY . .
 
 # Copy the .env file
-COPY backend/.env .env
+COPY .env .env
 
 # Build the application
 RUN CGO_ENABLED=1 go build -o main .

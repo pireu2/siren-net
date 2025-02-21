@@ -10,4 +10,5 @@ type User struct {
 	Username  string `gorm:"unique;not null"`
 	Password  string `gorm:"not null"`
 	LastLogin time.Time
+	IsActive  bool `gorm:"default:true"`
 }

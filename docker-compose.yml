@@ -7,3 +7,5 @@ services:
       - "8080:8080"
     env_file:
       - backend/.env
+    security_opt:
+      - no-new-privileges:true

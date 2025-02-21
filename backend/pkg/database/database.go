@@ -1,14 +1,16 @@
 package database
 
 import (
-	"backend/models"
+	"backend/internal/models"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
+type DB struct {
+	*gorm.DB
+}
 
-func Connect(databaseURL string) {
+func Connect(databaseURL string) *DB {
 	db, err := gorm.Open(sqlite.Open(databaseURL), &gorm.Config{})
 	if err != nil {
 		panic("Failed to connect to database")
@@ -19,5 +21,5 @@ func Connect(databaseURL string) {
 		panic("Failed to migrate database")
 	}
 
-	DB = db
+	return &DB{DB: db}
 }

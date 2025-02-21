@@ -1,26 +1,28 @@
-# Use the official Go image as the base image
-FROM golang:1.24
+FROM golang:1.24 AS builder
 
-# Set the working directory
 WORKDIR /app
 
-# Copy the Go module files
 COPY go.mod go.sum ./
 
-# Download dependencies
 RUN go mod download
 
-# Copy the rest of the backend code
 COPY . .
 
-# Copy the .env file
 COPY .env .env
 
-# Build the application
-RUN CGO_ENABLED=1 go build -o main .
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 \
+     go build -ldflags="-linkmode external -extldflags -static" -o /app/main ./cmd/web/
 
-# Expose the application port
+FROM alpine:latest
+
+WORKDIR /app
+
+COPY --from=builder /app/main .
+COPY --from=builder /app/.env .
+
+RUN apk add --no-cache libc6-compat gcompat
+RUN chmod +x main
+
 EXPOSE 8080
 
-# Run the application
 CMD ["./main"]

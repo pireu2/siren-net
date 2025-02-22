@@ -5,6 +5,9 @@ __pycache__/
 
 models/
 outputs/
+stable-diffusion/models/
+stable-diffusion/outputs/
+vllm/deepseek-cache/
 
 # C extensions
 *.so

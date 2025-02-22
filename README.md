@@ -37,8 +37,12 @@ siren-net/
 │   └── Dockerfile
 ├── frontend/
 │   └── ...
-├── stable-diffusion-webui/
-│   └── ...
+├── stable-diffusion/
+│   ├── models/
+│   ├── outputs/
+│   └── Dockerfile
+├── ollama/
+│   └── Dockerfile
 ├── .gitignore
 ├── .gitmodules
 ├── docker-compose.yml

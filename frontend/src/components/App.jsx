@@ -1,11 +1,17 @@
 import React from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { LoginForm } from './login-form.jsx';
+import Register from './Register.jsx';
+import AuthShuffle from './AuthSwitcher.jsx';
 
 function App() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <LoginForm />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<AuthShuffle />} />
+        <Route path="/register" element={<Register />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

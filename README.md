@@ -42,7 +42,10 @@ siren-net/
 │   ├── outputs/
 │   └── Dockerfile
 ├── ollama/
-│   └── Dockerfile
+│   ├── Dockerfile
+│   ├── Modelfile
+│   ├── serve.py
+│   └── start.sh
 ├── .gitignore
 ├── .gitmodules
 ├── docker-compose.yml

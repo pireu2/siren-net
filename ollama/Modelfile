@@ -1,0 +1,3 @@
+FROM hf.co/bartowski/DeepSeek-R1-Distill-Qwen-7B-GGUF:Q6_K
+SYSTEM "You are DeepSeek-R1-7B, a helpful AI assistant."
+PARAMETER temperature 0.7

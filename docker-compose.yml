@@ -33,7 +33,7 @@ services:
       security_opt:
         - no-new-privileges:true
 
-  deepseek:
+  ollama:
     build:
       context: ./ollama
       dockerfile: Dockerfile

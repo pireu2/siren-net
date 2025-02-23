@@ -38,13 +38,13 @@ siren-net/
 ├── frontend/
 │   └── ...
 ├── stable-diffusion/
-│   ├── models/
-│   ├── outputs/
+│   ├── models/  -- stable diffusion models and loras
+│   ├── outputs/ -- stable diffusion outputs
 │   └── Dockerfile
 ├── ollama/
+│   ├── models/  -- deepseek models
 │   ├── Dockerfile
 │   ├── Modelfile
-│   ├── serve.py
 │   └── start.sh
 ├── .gitignore
 ├── .gitmodules

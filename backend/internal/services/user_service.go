@@ -15,6 +15,7 @@ type UserService interface {
 	UpdateUser(ctx context.Context, user *models.User) error
 	DeleteUser(ctx context.Context, id uint) error
 	ExistsByUsername(ctx context.Context, username string) (bool, error)
+	ExistsByEmail(ctx context.Context, email string) (bool, error)
 }
 
 type userServiceImpl struct {
@@ -89,6 +90,22 @@ func (u userServiceImpl) ExistsByUsername(ctx context.Context, username string) 
 	return exists, nil
 }
 
+func (u userServiceImpl) ExistsByEmail(ctx context.Context, email string) (bool, error) {
+	var exists bool
+	err := u.db.WithContext(ctx).
+		Model(&models.User{}).
+		Select("count(*) > 0").
+		Where("email = ?", email).
+		Scan(&exists).
+		Error
+	if err != nil {
+		return false, err
+	}
+
+	return exists, nil
+}
+
 var (
 	ErrUserNotFound = errors.New("user not found")
+	ErrEmailTaken   = errors.New("email already taken")
 )

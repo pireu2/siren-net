@@ -11,7 +11,7 @@ import (
 )
 
 type AuthService interface {
-	Register(ctx context.Context, username, password string) (*models.User, error)
+	Register(ctx context.Context, username, email, password string) (*models.User, error)
 	Login(ctx context.Context, username, password string) (string, *models.User, error)
 }
 
@@ -29,7 +29,7 @@ func NewAuthService(userService UserService, jwtSecret string, tokenExpiry time.
 	}
 }
 
-func (s *authService) Register(ctx context.Context, username, password string) (*models.User, error) {
+func (s *authService) Register(ctx context.Context, username, email, password string) (*models.User, error) {
 	exists, err := s.userService.ExistsByUsername(ctx, username)
 	if err != nil {
 		return nil, err
@@ -46,6 +46,7 @@ func (s *authService) Register(ctx context.Context, username, password string) (
 
 	newUser := &models.User{
 		Username: username,
+		Email:    email,
 		Password: hashedPassword,
 	}
 

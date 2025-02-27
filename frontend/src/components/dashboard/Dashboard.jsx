@@ -15,8 +15,40 @@ import {
 } from "@/components/ui/sidebar"
 import TitleCard from "./TitleCards"
 import { dashboardSections } from "./TitleCards"
+import AiPromptingDashboard from "../ai-prompting/ai-dashboard"
+import { useState, useEffect } from 'react';
 
 export default function Dashboard() {
+  const [pageState, setState] = useState(()=>{
+    return localStorage.getItem('pageState') || "idle"
+  });
+  const possibleStates = {0:"idle", 1: "SD", 2:"AI"}
+
+
+  useEffect(() => {
+    localStorage.setItem('pageState', pageState);
+  }, [pageState]);
+
+
+  function changeState(key)
+  {
+    setState(possibleStates[key])
+  }
+
+  function IdleComponent()
+  {
+    return(
+      <>
+      <h1 className="text-3xl font-bold mb-4">Welcome to the <i>siren-net</i> Dashboard</h1>
+      <div className="grid gap-6 md:grid-cols-1">
+        {dashboardSections.map((section) => (
+          <TitleCard key={section.id} {...section} onClick = {()=> changeState(section.id)}/>
+        ))}
+      </div>
+      </>
+    );
+  }
+
   return (
     (<SidebarProvider>
       <AppSidebar />
@@ -40,12 +72,17 @@ export default function Dashboard() {
         </header>
         
         <div className="flex flex-1 flex-col gap-6 p-6 bg-white text-gray-900">
-          <h1 className="text-3xl font-bold mb-4">Welcome to the <i>siren-net</i> Dashboard</h1>
-          <div className="grid gap-6 md:grid-cols-1">
-            {dashboardSections.map((section) => (
-              <TitleCard key={section.id} {...section} />
-            ))}
-          </div>
+        {
+          (pageState === possibleStates[0])
+            ? <IdleComponent />
+            : 
+          (pageState === possibleStates[2]) // pentru ai
+            ? <AiPromptingDashboard onBack = {()=> setState(possibleStates[0])}/>
+            :
+          <h1 className="text-3xl font-bold mb-4">
+                Welcome to the <i>siren-net</i> Dashboard
+              </h1>
+        }
         </div>
       </SidebarInset>
     </SidebarProvider>)

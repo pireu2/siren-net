@@ -16,6 +16,7 @@ import {
 import TitleCard from "./TitleCards"
 import { dashboardSections } from "./TitleCards"
 import AiPromptingDashboard from "../ai-prompting/ai-dashboard"
+import ImageGeneratorDashboard from "../ai-prompting/sd-dashboard"
 import { useState, useEffect } from 'react';
 
 export default function Dashboard() {
@@ -49,6 +50,25 @@ export default function Dashboard() {
     );
   }
 
+
+  function PlaceHodler()
+  {
+    return(
+      <>
+      <div>
+        <h1 className="text-3xl font-bold mb-4">
+          Welcome to the <i>siren-net</i> Dashboard
+        </h1>
+        <div>
+          <button onClick = {()=> setState(possibleStates[0])}>
+            Back
+          </button>
+        </div>
+      </div>
+    </>
+    );
+  }
+
   return (
     (<SidebarProvider>
       <AppSidebar />
@@ -76,12 +96,13 @@ export default function Dashboard() {
           (pageState === possibleStates[0])
             ? <IdleComponent />
             : 
-          (pageState === possibleStates[2]) // pentru ai
-            ? <AiPromptingDashboard onBack = {()=> setState(possibleStates[0])}/>
+            (pageState === possibleStates[1]) // pentru stable diffusion
+            ? <ImageGeneratorDashboard onBack = {()=> setState(possibleStates[0])}/>
             :
-          <h1 className="text-3xl font-bold mb-4">
-                Welcome to the <i>siren-net</i> Dashboard
-              </h1>
+            (pageState === possibleStates[2]) // pentru ai
+              ? <AiPromptingDashboard onBack = {()=> setState(possibleStates[0])}/>
+              :
+              <PlaceHodler />
         }
         </div>
       </SidebarInset>

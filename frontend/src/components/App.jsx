@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { LoginForm } from './login-form.jsx';
 import Register from './Register.jsx';
 import AuthShuffle from './AuthSwitcher.jsx';
-import Dashboard from './dashboard/Dashboard.jsx'
+import Dashboard from './dashboard-container/Dashboard.jsx'
 
 function App() {
   return (

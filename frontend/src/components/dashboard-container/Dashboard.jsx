@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/dashboard/app-sidebar"
+import { AppSidebar } from "@/components/dashboard-container/app-sidebar"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -18,12 +18,13 @@ import { dashboardSections } from "./TitleCards"
 import AiPromptingDashboard from "../ai-prompting/ai-dashboard"
 import ImageGeneratorDashboard from "../ai-prompting/sd-dashboard"
 import { useState, useEffect } from 'react';
+import TeamPage from "../team/teamPage"
 
 export default function Dashboard() {
   const [pageState, setState] = useState(()=>{
     return localStorage.getItem('pageState') || "idle"
   });
-  const possibleStates = {0:"idle", 1: "SD", 2:"AI"}
+  const possibleStates = {0:"idle", 1: "SD", 2:"AI", 3:"TP"}
 
 
   useEffect(() => {
@@ -100,9 +101,12 @@ export default function Dashboard() {
             ? <ImageGeneratorDashboard onBack = {()=> setState(possibleStates[0])}/>
             :
             (pageState === possibleStates[2]) // pentru ai
-              ? <AiPromptingDashboard onBack = {()=> setState(possibleStates[0])}/>
-              :
-              <PlaceHodler />
+            ? <AiPromptingDashboard onBack = {()=> setState(possibleStates[0])}/>
+            :
+            (pageState === possibleStates[3]) // pentru team page
+            ? <TeamPage onBack = {()=> setState(possibleStates[0])}/>
+            :
+            <PlaceHodler />
         }
         </div>
       </SidebarInset>

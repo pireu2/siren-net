@@ -3,7 +3,7 @@ import * as React from "react"
 import {BarChart3, Home, Settings, Users  } from "lucide-react"
 import { useState } from "react"
 
-import { SearchForm } from "@/components/dashboard/search-form"
+import { SearchForm } from "@/components/dashboard-container/search-form"
 import {
 } from "@/components/ui/collapsible"
 import {

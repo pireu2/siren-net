@@ -4,8 +4,8 @@ import { LoginForm } from "./login-form";
 import { Register } from "./Register";
 
 const initialCards = [
-  { id: 1, component: <LoginForm />, name: "Login" },
-  { id: 2, component: <Register />, name: "Register" },
+  { id: 1, component: <LoginForm/>, name: "Login" },
+  { id: 2, component: <Register/>, name: "Register" },
 ];
 
 const AuthShuffle = () => {
@@ -18,6 +18,13 @@ const AuthShuffle = () => {
         return [...newCards, prevCards.find((c) => c.id === cardId)];
       });
     }
+  };
+
+  const handleShuffle = (cardId) => {
+    setCards((prevCards) => {
+      const newCards = prevCards.filter((c) => c.id !== cardId);
+      return [...newCards, prevCards.find((c) => c.id === cardId)];
+    });
   };
 
   return (
@@ -36,7 +43,7 @@ const AuthShuffle = () => {
             className="absolute w-full h-full bg-white rounded-lg shadow-lg border-4 border-white flex items-center justify-center cursor-grab"
             style={{ zIndex: cards.length - index }}
           >
-            {card.component}
+            {React.cloneElement(card.component, { onShuffle: () => handleShuffle(card.id)} )}
           </motion.div>
         ))}
       </div>

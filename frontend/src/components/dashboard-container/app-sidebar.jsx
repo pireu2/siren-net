@@ -1,7 +1,7 @@
 "use client"
 import * as React from "react"
 import {BarChart3, Home, Settings, Users  } from "lucide-react"
-import { useState } from "react"
+import { useState , useEffect} from "react"
 
 import { SearchForm } from "@/components/dashboard-container/search-form"
 import {
@@ -20,25 +20,41 @@ const data = {
   navMain: [
     {
       title: "Homepage",
-      url: "#",
+      url: "/",
       icon: Home,
+      id: 0 //ca sa corespunda cu id-ul de stateuri din dashboard
     },
     {
       title: "Team",
-      url: "#",
+      url: "/",
       icon: Users,
+      id: 3 //ca sa corespunda cu id-ul de stateuri din dashboard
     },
     {
       title: "Analytics",
-      url: "#",
+      url: "/",
       icon: BarChart3,
+      id: 4 //ca sa corespunda cu id-ul de stateuri din dashboard
     },
   ],
 }
 
-export function AppSidebar({...props}) {
+export function AppSidebar({webState, onStateChange, ...props}) {
   const [activeSection, setActiveSection] = useState(data.navMain[0].title)
 
+  function handleSectionChange(title)
+  {
+    setActiveSection(title)
+  }
+
+
+  useEffect(() => {
+    console.log("S a schimbat team stateu")
+    if(webState === "TP")
+      handleSectionChange("Team") 
+    else handleSectionChange("Homepage"); // Aici defapt ne luam dupa title cardurile din dashboard
+    return () => {};
+  }, [webState]);
 
   return (
     (<Sidebar {...props}>
@@ -70,11 +86,14 @@ export function AppSidebar({...props}) {
               <SidebarMenuButton
                 asChild
                 isActive={activeSection === item.title}
-                onClick={() => setActiveSection(item.title)}>
-                <a href={item.url}> {/* Aici se va pune Link penttru routing! */}
+                onClick={() => {
+                  handleSectionChange(item.title); 
+                  onStateChange(item.id);
+                  }}>
+                <div> {/* Aici se va pune Link penttru routing! */}
                   <item.icon className="mr-2 h-4 w-4" />
                   <span>{item.title}</span>
-                </a>
+                </div>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}

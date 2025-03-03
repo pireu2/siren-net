@@ -10,11 +10,10 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 
-export function Register({ onClick }) {
+export function Register({ onShuffle }) {
   const form = useForm();
 
   const onSubmit = (data) => {
@@ -79,9 +78,9 @@ export function Register({ onClick }) {
               </div>
               <div className="mt-4 text-center text-sm">
                 Already have an account?{" "}
-                <Link to="/" className="underline underline-offset-4" onClick={onClick}>
+                <a className="underline underline-offset-4" onClick={onShuffle}>
                   Login
-                </Link>
+                </a>
               </div>
             </form>
           </Form>

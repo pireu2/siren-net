@@ -24,7 +24,7 @@ export default function Dashboard() {
   const [pageState, setState] = useState(()=>{
     return localStorage.getItem('pageState') || "idle"
   });
-  const possibleStates = {0:"idle", 1: "SD", 2:"AI", 3:"TP"}
+  const possibleStates = {0:"idle", 1: "SD", 2:"AI", 3:"TP", 4:"AN"}
 
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function Dashboard() {
   }
 
 
-  function PlaceHodler()
+  function PlaceHolder()
   {
     return(
       <>
@@ -72,7 +72,7 @@ export default function Dashboard() {
 
   return (
     (<SidebarProvider>
-      <AppSidebar />
+      <AppSidebar webState = {pageState} onStateChange = {arg => changeState(arg)}/>
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
@@ -106,7 +106,7 @@ export default function Dashboard() {
             (pageState === possibleStates[3]) // pentru team page
             ? <TeamPage onBack = {()=> setState(possibleStates[0])}/>
             :
-            <PlaceHodler />
+            <PlaceHolder />
         }
         </div>
       </SidebarInset>

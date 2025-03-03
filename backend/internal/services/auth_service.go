@@ -35,7 +35,7 @@ func (s *authService) Register(ctx context.Context, username, email, password st
 		return nil, err
 	}
 
-	if !exists {
+	if exists {
 		return nil, ErrUsernameTaken
 	}
 

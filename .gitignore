@@ -9,6 +9,8 @@ stable-diffusion/models/
 stable-diffusion/outputs/
 ollama/deepseek-cache/
 
+*.db
+
 # C extensions
 *.so
 

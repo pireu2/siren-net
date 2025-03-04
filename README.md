@@ -16,9 +16,14 @@ siren-net/
 │   │   │   ├── config.go
 │   │   ├── handlers/
 │   │   │   ├── auth_handler.go
+│   │   │   ├── auth_handler_test.go
 │   │   ├── middleware/
 │   │   │   ├── auth_middleware.go
 │   │   ├── models/
+│   │   │   ├── agent.go
+│   │   │   ├── client.go
+│   │   │   ├── message.go
+│   │   │   ├── transaction.go
 │   │   │   ├── user.go
 │   │   ├── routes/
 │   │   │   ├── routes.go
@@ -31,9 +36,13 @@ siren-net/
 │   ├── pkg/
 │   │   └── database/
 │   │       ├── database.go
+│   ├── tests/
+│   │   └── integration/
+│   │       ├── auth_test.go
 │   ├── go.mod
 │   ├── go.sum
 │   ├── .env
+│   ├── .env.example
 │   └── Dockerfile
 ├── frontend/
 │   └── ...

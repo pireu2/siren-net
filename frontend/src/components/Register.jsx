@@ -16,12 +16,34 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 export function Register({ onShuffle }) {
   const form = useForm();
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
+  const onSubmit = async (formData) => {
+    console.log("Form Data:", formData);
+
+    try {
+      const response = await fetch("/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert("Registration successful!");
+      } else {
+        alert("Error: " + data.error);
+      }
+    } 
+    
+    catch (error) {
+      console.error("Error:", error);
+    }
+
   };
 
   return (
-    <div className={cn("flex flex-col gap-6 items-center justify-center w-full max-w-md h-[500px]")}>
+    <div className={cn("flex flex-col gap-6 items-center justify-center w-full max-w-md h-[600px]")}>
       <Card className="w-full h-full flex flex-col justify-between">
         <CardHeader className="text-center">
           <CardTitle>Create a new account</CardTitle>
@@ -66,6 +88,19 @@ export function Register({ onShuffle }) {
                     <FormLabel htmlFor="password">Password</FormLabel>
                     <FormControl>
                       <Input id="password" type="password" placeholder="Your password" {...field} required />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="confirm_password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="confirm_password">Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input id="confirm_password" type="password" placeholder="Your password" {...field} required />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

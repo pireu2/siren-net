@@ -20,8 +20,30 @@ export function LoginForm({
 }) {
   const form = useForm();
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
+  const onSubmit = async (formData) => {
+    console.log("Form Data:", formData);
+
+    try {
+      const response = await fetch("/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert("Registration successful!");
+      } else {
+        alert("Error: " + data.error);
+      }
+    } 
+    
+    catch (error) {
+      console.error("Error:", error);
+    }
+
   };
 
 

@@ -10,6 +10,7 @@ stable-diffusion/outputs/
 ollama/deepseek-cache/
 
 *.db
+*.ps1
 
 # C extensions
 *.so

@@ -11,6 +11,7 @@ type DB struct {
 }
 
 func Connect(databaseURL string) *DB {
+
 	db, err := gorm.Open(sqlite.Open(databaseURL), &gorm.Config{})
 	if err != nil {
 		panic("Failed to connect to database")

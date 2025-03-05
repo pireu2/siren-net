@@ -1,5 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import { useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,9 +13,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import Popup from "./popUp/pop-up";
 
 export function Register({ onShuffle }) {
   const form = useForm();
+
+  const [isOpen, setOpen] = useState(false);
+  const[message , setMessage]= useState('');
 
   const onSubmit = async (formData) => {
     console.log("Form Data:", formData);
@@ -32,7 +37,8 @@ export function Register({ onShuffle }) {
       if (response.ok) {
         alert("Registration successful!");
       } else {
-        alert("Error: " + data.error);
+        setMessage(`${data.error.charAt(0).toUpperCase() + data.error.slice(1)}.`);
+        setOpen(true);
       }
     } 
     
@@ -47,6 +53,7 @@ export function Register({ onShuffle }) {
       <Card className="w-full h-full flex flex-col justify-between">
         <CardHeader className="text-center">
           <CardTitle>Create a new account</CardTitle>
+          <Popup isOpen = {isOpen} setOpenState={setOpen} message={message}/> 
           <CardDescription style={{ marginTop: '14%' }}> 
             Enter your details below to create a new account
           </CardDescription>

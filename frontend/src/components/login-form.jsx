@@ -9,9 +9,13 @@ import {
 } from "@/components/ui/card"
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input"
+import { useState} from "react";
 import { Label } from "@/components/ui/label"
 import { Link } from "react-router-dom";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { useNavigate } from "react-router-dom";
+import Popup from "./popUp/pop-up";
+
 
 export function LoginForm({
   className,
@@ -19,6 +23,10 @@ export function LoginForm({
   ...props
 }) {
   const form = useForm();
+
+  const navigate = useNavigate();
+  const [isOpen, setOpen] = useState(false);
+  const[message , setMessage]= useState('');
 
   const onSubmit = async (formData) => {
     console.log("Form Data:", formData);
@@ -34,9 +42,13 @@ export function LoginForm({
 
       const data = await response.json();
       if (response.ok) {
-        alert("Registration successful!");
+        alert("Login successful!");
+        console.log(data);
+        localStorage.setItem('token',data.token);
+        navigate("/dashboard");
       } else {
-        alert("Error: " + data.error);
+        setOpen(true);
+        setMessage(`${data.error.charAt(0).toUpperCase() + data.error.slice(1)}.`);
       }
     } 
     
@@ -52,6 +64,7 @@ export function LoginForm({
       <Card className="w-full h-full flex flex-col justify-between">
         <CardHeader className="text-center" style={{ marginTop: '14%' }}>
           <CardTitle>Login to your account</CardTitle>
+          <Popup isOpen = {isOpen} setOpenState={setOpen} message={message}/> 
           <CardDescription style={{ marginTop: '14%' }}>
             Enter your username below to login to your account
           </CardDescription>

@@ -10,8 +10,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<AuthShuffle />} />
-        {/* <Route path="/" element={<Dashboard />} /> */}
-        <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>
   );

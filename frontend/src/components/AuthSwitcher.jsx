@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { LoginForm } from "./login-form";
 import { Register } from "./Register";
+import Popup from "./popUp/pop-up";
 
 const initialCards = [
   { id: 1, component: <LoginForm/>, name: "Login" },

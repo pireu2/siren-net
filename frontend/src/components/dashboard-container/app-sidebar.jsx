@@ -20,19 +20,19 @@ const data = {
   navMain: [
     {
       title: "Homepage",
-      url: "/",
+      url: "/dashboard",
       icon: Home,
       id: 0 //ca sa corespunda cu id-ul de stateuri din dashboard
     },
     {
       title: "Team",
-      url: "/",
+      url: "/dashboard",
       icon: Users,
       id: 3 //ca sa corespunda cu id-ul de stateuri din dashboard
     },
     {
       title: "Analytics",
-      url: "/",
+      url: "/dashboard",
       icon: BarChart3,
       id: 4 //ca sa corespunda cu id-ul de stateuri din dashboard
     },

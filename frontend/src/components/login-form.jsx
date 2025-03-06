@@ -10,10 +10,7 @@ import {
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input"
 import { useState} from "react";
-import { Label } from "@/components/ui/label"
-import { Link } from "react-router-dom";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { useNavigate } from "react-router-dom";
 import Popup from "./popUp/pop-up";
 
 
@@ -22,9 +19,13 @@ export function LoginForm({
   onShuffle,
   ...props
 }) {
-  const form = useForm();
+  const form = useForm({
+    defaultValues: {
+    username: '',
+    password: ''
+  }
+});
 
-  const navigate = useNavigate();
   const [isOpen, setOpen] = useState(false);
   const[message , setMessage]= useState('');
 
@@ -45,7 +46,7 @@ export function LoginForm({
         alert("Login successful!");
         console.log(data);
         localStorage.setItem('token',data.token);
-        navigate("/dashboard");
+        window.location.href = "/dashboard";
       } else {
         setOpen(true);
         setMessage(`${data.error.charAt(0).toUpperCase() + data.error.slice(1)}.`);

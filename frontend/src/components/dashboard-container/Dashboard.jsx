@@ -17,15 +17,16 @@ import TitleCard from "./TitleCards"
 import { dashboardSections } from "./TitleCards"
 import AiPromptingDashboard from "../ai-prompting/ai-dashboard"
 import ImageGeneratorDashboard from "../ai-prompting/sd-dashboard"
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import TeamPage from "../team/teamPage"
+import { AuthContext } from "../auth/auth-handler";
 
 export default function Dashboard() {
   const [pageState, setState] = useState(()=>{
     return localStorage.getItem('pageState') || "idle"
   });
   const possibleStates = {0:"idle", 1: "SD", 2:"AI", 3:"TP", 4:"AN"}
-
+  const {logout} = useContext(AuthContext);
 
   useEffect(() => {
     localStorage.setItem('pageState', pageState);
@@ -35,6 +36,11 @@ export default function Dashboard() {
   function changeState(key)
   {
     setState(possibleStates[key])
+  }
+
+  const onLogout = ()=>{
+    logout();
+    window.location.href = "/";
   }
 
   function IdleComponent()
@@ -80,7 +86,7 @@ export default function Dashboard() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="#">
+                <BreadcrumbLink onClick = {onLogout}>
                   Log-off
                 </BreadcrumbLink>
               </BreadcrumbItem>

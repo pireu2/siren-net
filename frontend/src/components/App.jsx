@@ -1,18 +1,32 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { LoginForm } from './login-form';
-import Register from './Register.jsx';
 import AuthShuffle from './AuthSwitcher';
 import Dashboard from './dashboard-container/Dashboard.jsx'
+import AuthProvider,{ AuthContext } from "./auth/auth-handler";
+import { useContext} from "react";
 
 function App() {
   return (
+    <AuthProvider>
+      <AppRoutes/>
+    </AuthProvider>
+  );
+}
+
+
+function AppRoutes()
+{
+  const { user } = useContext(AuthContext);
+  const condition = user ? <Dashboard /> : <AuthShuffle />;
+  return (
+    <>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<AuthShuffle />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/" element={condition} />
+          <Route path="/dashboard" element={condition} />
       </Routes>
     </BrowserRouter>
+    </>
   );
 }
 

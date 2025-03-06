@@ -16,7 +16,14 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import Popup from "./popUp/pop-up";
 
 export function Register({ onShuffle }) {
-  const form = useForm();
+  const form = useForm({
+    defaultValues: {
+    username: '',
+    email: '',
+    password: '',
+    confirm_password: ''
+  }
+});
 
   const [isOpen, setOpen] = useState(false);
   const[message , setMessage]= useState('');

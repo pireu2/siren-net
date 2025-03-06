@@ -61,9 +61,9 @@ export function LoginForm({
 
 
   return (
-    <div className={cn("flex flex-col gap-6 items-center justify-center w-full max-w-md h-[500px]", className)} {...props}>
+    <div className={cn("flex flex-col gap-6 items-center justify-center w-full max-w-md h-[600px]", className)} {...props}>
       <Card className="w-full h-full flex flex-col justify-between">
-        <CardHeader className="text-center" style={{ marginTop: '14%' }}>
+        <CardHeader className="text-center" style={{ marginTop: '20%' }}>
           <CardTitle>Login to your account</CardTitle>
           <Popup isOpen = {isOpen} setOpenState={setOpen} message={message}/> 
           <CardDescription style={{ marginTop: '14%' }}>
@@ -72,7 +72,7 @@ export function LoginForm({
         </CardHeader>
         <CardContent className="flex-1 flex flex-col justify-center">
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-12">
               <FormField
                 control={form.control}
                 name="username"

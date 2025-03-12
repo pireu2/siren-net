@@ -3,10 +3,10 @@ package services
 import (
 	"context"
 	"errors"
-	"github.com/golang-jwt/jwt/v5"
-	"time"
 
+	"backend/internal/config"
 	"backend/internal/models"
+	"backend/internal/token"
 	"backend/internal/utils"
 )
 
@@ -17,15 +17,13 @@ type AuthService interface {
 
 type authService struct {
 	userService UserService
-	jwtSecret   string
-	tokenExpiry time.Duration
+	cfg         *config.Config
 }
 
-func NewAuthService(userService UserService, jwtSecret string, tokenExpiry time.Duration) AuthService {
+func NewAuthService(userService UserService, cfg *config.Config) AuthService {
 	return &authService{
 		userService: userService,
-		jwtSecret:   jwtSecret,
-		tokenExpiry: tokenExpiry,
+		cfg:         cfg,
 	}
 }
 
@@ -70,23 +68,12 @@ func (s *authService) Login(ctx context.Context, username, password string) (str
 		return "", nil, ErrInvalidCredentials
 	}
 
-	token, err := s.generateToken(user)
+	generatedToken, err := token.GenerateToken(user.ID, user.Username, s.cfg.JWTSecret, s.cfg.TokenExpiry)
 	if err != nil {
 		return "", nil, err
 	}
 
-	return token, user, nil
-}
-
-func (s *authService) generateToken(user *models.User) (string, error) {
-	claims := jwt.MapClaims{
-		"user-id":  user.ID,
-		"username": user.Username,
-		"exp":      time.Now().Add(s.tokenExpiry).Unix(),
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(s.jwtSecret))
+	return generatedToken, user, nil
 }
 
 var (

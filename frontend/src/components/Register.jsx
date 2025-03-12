@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { useState, useRef } from "react";
 import { cn } from "@/lib/utils";
@@ -11,9 +11,9 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Link } from "react-router-dom";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import Popup from "./popUp/pop-up";
+import { AuthContext } from "./auth/auth-handler";
 
 export function Register({ onShuffle }) {
   const form = useForm({
@@ -25,35 +25,7 @@ export function Register({ onShuffle }) {
   }
 });
 
-  const [isOpen, setOpen] = useState(false);
-  const[message , setMessage]= useState('');
-
-  const onSubmit = async (formData) => {
-    console.log("Form Data:", formData);
-
-    try {
-      const response = await fetch("/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        alert("Registration successful!");
-      } else {
-        setMessage(`${data.error.charAt(0).toUpperCase() + data.error.slice(1)}.`);
-        setOpen(true);
-      }
-    } 
-    
-    catch (error) {
-      console.error("Error:", error);
-    }
-
-  };
+  const {message, setOpen, register, isOpen} = useContext(AuthContext);
 
   return (
     <div className={cn("flex flex-col gap-6 items-center justify-center w-full max-w-md h-[600px]")}>
@@ -67,7 +39,7 @@ export function Register({ onShuffle }) {
         </CardHeader>
         <CardContent className="flex-1 flex flex-col justify-center">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
+            <form onSubmit={form.handleSubmit(register)} className="flex flex-col gap-6">
               <FormField
                 control={form.control}
                 name="username"

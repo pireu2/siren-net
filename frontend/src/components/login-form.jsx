@@ -12,7 +12,9 @@ import { Input } from "@/components/ui/input"
 import { useState} from "react";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import Popup from "./popUp/pop-up";
+import { jwtDecode } from "jwt-decode";
 
+import { useNavigate } from "react-router-dom";
 
 export function LoginForm({
   className,
@@ -28,12 +30,14 @@ export function LoginForm({
 
   const [isOpen, setOpen] = useState(false);
   const[message , setMessage]= useState('');
+  const navigate = useNavigate();
+
 
   const onSubmit = async (formData) => {
     console.log("Form Data:", formData);
 
     try {
-      const response = await fetch("/auth/login", {
+      const response = await fetch("auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -42,12 +46,19 @@ export function LoginForm({
       });
 
       const data = await response.json();
+
       if (response.ok) {
         alert("Login successful!");
         console.log(data);
+
         localStorage.setItem('token',data.token);
-        window.location.href = "/dashboard";
-      } else {
+        const token = localStorage.getItem('token');
+        const decoded = jwtDecode(token);
+        console.log(decoded);
+
+        navigate('/dashboard');
+        window.location.reload();
+      }else {
         setOpen(true);
         setMessage(`${data.error.charAt(0).toUpperCase() + data.error.slice(1)}.`);
       }

@@ -18,6 +18,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      "/protected": {
+        target: "http://localhost:8080", // Backendul in go
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 })

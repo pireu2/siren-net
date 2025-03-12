@@ -21,17 +21,51 @@ import { useState, useEffect, useContext } from 'react';
 import TeamPage from "../team/teamPage"
 import { AuthContext } from "../auth/auth-handler";
 
-export default function Dashboard() {
+export default function Dashboard() 
+{
+
   const [pageState, setState] = useState(()=>{
     return localStorage.getItem('pageState') || "idle"
   });
+
   const possibleStates = {0:"idle", 1: "SD", 2:"AI", 3:"TP", 4:"AN"}
   const {logout} = useContext(AuthContext);
 
+  
   useEffect(() => {
     localStorage.setItem('pageState', pageState);
   }, [pageState]);
 
+
+  //we check here wether the jwt token is valid or not, we pass a timerId
+  useEffect(() => { 
+      const makeProtectedRequest = async () => { 
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No token found, user is not logged in");
+        return;
+      }
+    
+      try {
+        const response = await fetch("protected/", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+        
+        const data = await response.json(); 
+        if(data.error)
+        {
+          logout();
+        }
+      } catch (error) {
+        console.error("Error making protected request:", error);
+      }
+    };
+    makeProtectedRequest();
+    }, []);
 
   function changeState(key)
   {
@@ -40,7 +74,6 @@ export default function Dashboard() {
 
   const onLogout = ()=>{
     logout();
-    window.location.href = "/";
   }
 
   function IdleComponent()

@@ -3,7 +3,6 @@ package middleware
 import (
 	"backend/internal/config"
 	"backend/internal/services"
-	"backend/internal/token"
 	"context"
 	"errors"
 
@@ -30,10 +29,6 @@ func NewAuthMiddleware(cfg *config.Config, userService services.UserService) *Au
 		cfg:         cfg,
 		userService: userService,
 	}
-}
-
-func (m *AuthMiddleware) GenerateToken(userID uint, username string) (string, error) {
-	return token.GenerateToken(userID, username, m.cfg.JWTSecret, m.cfg.TokenExpiry)
 }
 
 func (m *AuthMiddleware) JWTAuth() gin.HandlerFunc {

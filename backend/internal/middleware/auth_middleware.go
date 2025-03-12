@@ -3,9 +3,9 @@ package middleware
 import (
 	"backend/internal/config"
 	"backend/internal/services"
+	"backend/internal/token"
 	"context"
 	"errors"
-	"time"
 
 	"net/http"
 	"strings"
@@ -33,16 +33,7 @@ func NewAuthMiddleware(cfg *config.Config, userService services.UserService) *Au
 }
 
 func (m *AuthMiddleware) GenerateToken(userID uint, username string) (string, error) {
-	claims := CustomClaims{
-		UserID:   userID,
-		Username: username,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(m.cfg.JWTSecret))
+	return token.GenerateToken(userID, username, m.cfg.JWTSecret, m.cfg.TokenExpiry)
 }
 
 func (m *AuthMiddleware) JWTAuth() gin.HandlerFunc {
@@ -54,16 +45,16 @@ func (m *AuthMiddleware) JWTAuth() gin.HandlerFunc {
 		}
 
 		tokenString := strings.TrimPrefix(authHandler, "Bearer ")
-		token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		tokenClaimed, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 			return []byte(m.cfg.JWTSecret), nil
 		})
 
-		if err != nil || !token.Valid {
+		if err != nil || !tokenClaimed.Valid {
 			services.RespondError(c, http.StatusUnauthorized, errors.New("invalid token"))
 			return
 		}
 
-		claims, ok := token.Claims.(*CustomClaims)
+		claims, ok := tokenClaimed.Claims.(*CustomClaims)
 		if !ok {
 			services.RespondError(c, http.StatusUnauthorized, errors.New("invalid token claims"))
 			return

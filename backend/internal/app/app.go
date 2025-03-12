@@ -24,8 +24,7 @@ func New() *Application {
 
 	authService := services.NewAuthService(
 		userService,
-		cfg.JWTSecret,
-		cfg.TokenExpiry,
+		&cfg,
 	)
 
 	authHandler := handlers.NewAuthHandler(authService)

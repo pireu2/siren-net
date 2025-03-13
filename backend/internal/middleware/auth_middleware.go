@@ -46,12 +46,14 @@ func (m *AuthMiddleware) JWTAuth() gin.HandlerFunc {
 
 		if err != nil || !tokenClaimed.Valid {
 			services.RespondError(c, http.StatusUnauthorized, errors.New("invalid token"))
+			c.Abort()
 			return
 		}
 
 		claims, ok := tokenClaimed.Claims.(*CustomClaims)
 		if !ok {
 			services.RespondError(c, http.StatusUnauthorized, errors.New("invalid token claims"))
+			c.Abort()
 			return
 		}
 
@@ -59,6 +61,7 @@ func (m *AuthMiddleware) JWTAuth() gin.HandlerFunc {
 		user, err := m.userService.GetUserByID(ctx, claims.UserID)
 		if err != nil {
 			services.RespondError(c, http.StatusUnauthorized, errors.New("user not found"))
+			c.Abort()
 			return
 		}
 

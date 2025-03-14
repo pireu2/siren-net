@@ -1,6 +1,6 @@
 import { createContext, useEffect } from "react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import useCookie from 'react-use-cookie';
 
 export const AuthContext  = createContext();
 
@@ -8,7 +8,6 @@ export const AuthContext  = createContext();
 export default function AuthProvider({children})
 {
     const [user, setUser] = useState(null);
-
 
     const [isOpen, setOpen] = useState(false);
     const[message , setMessage]= useState('');
@@ -27,8 +26,6 @@ export default function AuthProvider({children})
 
 
     const register = async (formData) => {
-        console.log("Form Data:", formData);
-    
         try {
           const response = await fetch("/auth/register", {
             method: "POST",
@@ -51,11 +48,38 @@ export default function AuthProvider({children})
     
       };
 
-    const login = (token) =>
-    {
-        localStorage.setItem('token',token);
-        setUser({token});
-    }
+    const login = async (formData) => {
+      try {
+        const response = await fetch("auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+  
+        const data = await response.json();
+
+        if (response.ok) {
+          const token = data.token;
+          localStorage.setItem('token',token);
+          setUser({token});
+          window.location.reload();
+        }
+        else {
+          console.log(data);
+          setOpen(true);
+          setMessage(`${data.error.charAt(0).toUpperCase() + data.error.slice(1)}.`);
+        }
+      } 
+      
+      catch (error) {
+        console.error("Error:", error);
+      }
+  
+    };
+
+
 
     const logout = () =>
         {
@@ -67,7 +91,8 @@ export default function AuthProvider({children})
 
     return(
         <>
-        <AuthContext.Provider value={{user, login, logout, register, setMessage, isOpen}}>
+        <AuthContext.Provider 
+        value={{user, login, logout, register, setMessage, isOpen,setOpen,message}}>
             {children}
         </AuthContext.Provider>
         </>

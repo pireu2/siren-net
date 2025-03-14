@@ -9,12 +9,12 @@ import {
 } from "@/components/ui/card"
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input"
-import { useState} from "react";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import Popup from "./popUp/pop-up";
 import { jwtDecode } from "jwt-decode";
-
+import React, { useContext,useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "./auth/auth-handler";
 
 export function LoginForm({
   className,
@@ -28,47 +28,7 @@ export function LoginForm({
   }
 });
 
-  const [isOpen, setOpen] = useState(false);
-  const[message , setMessage]= useState('');
-  const navigate = useNavigate();
-
-
-  const onSubmit = async (formData) => {
-    console.log("Form Data:", formData);
-
-    try {
-      const response = await fetch("auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("Login successful!");
-        console.log(data);
-
-        localStorage.setItem('token',data.token);
-        const token = localStorage.getItem('token');
-        const decoded = jwtDecode(token);
-        console.log(decoded);
-
-        navigate('/dashboard');
-        window.location.reload();
-      }else {
-        setOpen(true);
-        setMessage(`${data.error.charAt(0).toUpperCase() + data.error.slice(1)}.`);
-      }
-    } 
-    
-    catch (error) {
-      console.error("Error:", error);
-    }
-
-  };
+  const {message, setOpen, login, isOpen} = useContext(AuthContext);
 
 
   return (
@@ -83,7 +43,7 @@ export function LoginForm({
         </CardHeader>
         <CardContent className="flex-1 flex flex-col justify-center">
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-12">
+            <form onSubmit={form.handleSubmit(login)} className="flex flex-col gap-12">
               <FormField
                 control={form.control}
                 name="username"

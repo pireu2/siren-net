@@ -8,7 +8,6 @@ export default function Popup({
   message,
   isOpen,
   setOpenState,
-  onClose,
   duration = 1000,
   className,
 }) {
@@ -19,18 +18,16 @@ export default function Popup({
     if (isOpen && duration > 0) {
       timer = setTimeout(() => {
         setOpenState(false)
-        onClose?.()
       }, duration)
     }
     
     return () => {
       if (timer) clearTimeout(timer)
     }
-  }, [isOpen, duration, onClose])
+  }, [isOpen, duration])
 
   const handleClose = () => {
     setOpenState(false)
-    onClose?.()
   }
 
   if (!isOpen) return null

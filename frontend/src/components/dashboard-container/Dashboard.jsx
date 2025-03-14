@@ -20,6 +20,8 @@ import ImageGeneratorDashboard from "../ai-prompting/sd-dashboard"
 import { useState, useEffect, useContext } from 'react';
 import TeamPage from "../team/teamPage"
 import { AuthContext } from "../auth/auth-handler";
+import { getCookie } from 'react-use-cookie';
+
 
 export default function Dashboard() 
 {
@@ -37,10 +39,10 @@ export default function Dashboard()
   }, [pageState]);
 
 
-  //we check here wether the jwt token is valid or not, we pass a timerId
   useEffect(() => { 
       const makeProtectedRequest = async () => { 
-      const token = localStorage.getItem("token");
+      const token = getCookie('token');
+      console.log(`The cookie is ${token}`)
       if (!token) {
         console.error("No token found, user is not logged in");
         return;

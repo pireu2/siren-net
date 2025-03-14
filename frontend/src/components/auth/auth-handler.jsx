@@ -1,13 +1,13 @@
 import { createContext, useEffect } from "react";
 import { useState } from "react";
-import useCookie from 'react-use-cookie';
+import useCookie,{ getCookie } from 'react-use-cookie';
 
 export const AuthContext  = createContext();
 
 
 export default function AuthProvider({children})
 {
-    const [user, setUser] = useState(null);
+    const [userToken, setUserToken, removeUserToken] = useCookie('token', 0);
 
     const [isOpen, setOpen] = useState(false);
     const[message , setMessage]= useState('');
@@ -15,11 +15,11 @@ export default function AuthProvider({children})
       
     useEffect(() =>
         {
-            const token = localStorage.getItem('token');
+            const token = getCookie('token');
             if(token)
             {
                 console.log("It has a token!");
-                setUser({token});
+                setUserToken(token);
             }
         },
     []);
@@ -62,9 +62,8 @@ export default function AuthProvider({children})
 
         if (response.ok) {
           const token = data.token;
-          localStorage.setItem('token',token);
-          setUser({token});
-          window.location.reload();
+          setUserToken(token);
+          window.location.href = "/dashboard";
         }
         else {
           console.log(data);
@@ -83,8 +82,7 @@ export default function AuthProvider({children})
 
     const logout = () =>
         {
-            localStorage.removeItem('token');
-            setUser(null);
+            removeUserToken();
             window.location.href = "/";
         }
 
@@ -92,7 +90,7 @@ export default function AuthProvider({children})
     return(
         <>
         <AuthContext.Provider 
-        value={{user, login, logout, register, setMessage, isOpen,setOpen,message}}>
+        value={{login, logout, register, setMessage, isOpen,setOpen,message}}>
             {children}
         </AuthContext.Provider>
         </>

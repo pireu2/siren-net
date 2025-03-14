@@ -3,7 +3,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import AuthShuffle from './AuthSwitcher';
 import Dashboard from './dashboard-container/Dashboard.jsx'
 import AuthProvider,{ AuthContext } from "./auth/auth-handler";
-import { useContext, useEffect} from "react";
+import { useEffect} from "react";
+import { getCookie } from 'react-use-cookie';
 
 function App() {
   return (
@@ -16,7 +17,7 @@ function App() {
 
 function AppRoutes()
 {
-  const { user } = useContext(AuthContext);
+  const token = getCookie('token');
   const [loading, setLoading] = useState(true);
 
 
@@ -26,8 +27,7 @@ function AppRoutes()
     }
   }, []);
 
-
-  const condition = user ? <Dashboard /> : <AuthShuffle />;
+  const condition = token ? <Dashboard /> : <AuthShuffle />;
 
   if (loading) {
     return null;

@@ -15,6 +15,8 @@ import { jwtDecode } from "jwt-decode";
 import React, { useContext,useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./auth/auth-handler";
+import { Eye , EyeOff} from 'lucide-react';
+
 
 export function LoginForm({
   className,
@@ -29,6 +31,7 @@ export function LoginForm({
 });
 
   const {message, setOpen, login, isOpen} = useContext(AuthContext);
+  const [showPassword, setShowPassword] = useState(false);
 
 
   return (
@@ -36,7 +39,7 @@ export function LoginForm({
       <Card className="w-full h-full flex flex-col justify-between">
         <CardHeader className="text-center" style={{ marginTop: '20%' }}>
           <CardTitle>Login to your account</CardTitle>
-          <Popup isOpen = {isOpen} setOpenState={setOpen} message={message}/> 
+          <Popup isOpen={isOpen} setOpenState={setOpen} message={message}/> 
           <CardDescription style={{ marginTop: '14%' }}>
             Enter your username below to login to your account
           </CardDescription>
@@ -62,12 +65,29 @@ export function LoginForm({
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel htmlFor="password">Password</FormLabel>
-                    <FormControl>
-                      <Input id="password" type="password" placeholder="Your password" {...field} required />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl className="relative">
+                    <div className="relative">
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Your password"
+                        {...field}
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground hover:text-foreground"
+                        onClick={()=>setShowPassword(!showPassword) }
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
+                      </Button>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
                 )}
               />
               <div className="flex flex-col gap-3">

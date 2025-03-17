@@ -42,9 +42,7 @@ export default function Dashboard()
   useEffect(() => { 
       const makeProtectedRequest = async () => { 
       const token = getCookie('token');
-      console.log(`The cookie is ${token}`)
       if (!token) {
-        console.error("No token found, user is not logged in");
         return;
       }
     

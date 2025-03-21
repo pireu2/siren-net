@@ -33,39 +33,41 @@ export default function Dashboard()
   const possibleStates = {0:"idle", 1: "SD", 2:"AI", 3:"TP", 4:"AN"}
   const {logout} = useContext(AuthContext);
 
+  const [isLightThemed, setTheme] = useState(false);
+
   
   useEffect(() => {
     localStorage.setItem('pageState', pageState);
   }, [pageState]);
 
 
-  useEffect(() => { 
-      const makeProtectedRequest = async () => { 
-      const token = getCookie('token');
-      if (!token) {
-        return;
-      }
+  // useEffect(() => { 
+  //     const makeProtectedRequest = async () => { 
+  //     const token = getCookie('token');
+  //     if (!token) {
+  //       return;
+  //     }
     
-      try {
-        const response = await fetch("protected/", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
-        });
+  //     try {
+  //       const response = await fetch("protected/", {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           "Authorization": `Bearer ${token}`,
+  //         },
+  //       });
         
-        const data = await response.json(); 
-        if(data.error)
-        {
-          logout();
-        }
-      } catch (error) {
-        console.error("Error making protected request:", error);
-      }
-    };
-    makeProtectedRequest();
-    }, []);
+  //       const data = await response.json(); 
+  //       if(data.error)
+  //       {
+  //         logout();
+  //       }
+  //     } catch (error) {
+  //       console.error("Error making protected request:", error);
+  //     }
+  //   };
+  //   makeProtectedRequest();
+  //   }, []);
 
   function changeState(key)
   {
@@ -113,25 +115,26 @@ export default function Dashboard()
     (<SidebarProvider>
       <AppSidebar webState = {pageState} onStateChange = {arg => changeState(arg)}/>
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+        <header className={isLightThemed ? "flex h-16 shrink-0 items-center gap-2 border-b px-4" : 
+          "flex h-16 shrink-0 items-center gap-2 border-b border-gray-700 px-4 bg-gray-900 text-gray-100"}>
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
           <Breadcrumb>
             <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink onClick = {onLogout}>
+            <BreadcrumbItem className={`hidden md:block ${!isLightThemed && "text-white"}`}>
+                <BreadcrumbLink onClick = {onLogout} className = {!isLightThemed && " hover:text-gray-400"}>
                   Log-off
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbSeparator className="hidden md:block"/>
               <BreadcrumbItem>
-                <BreadcrumbPage>Dashboard</BreadcrumbPage>
+                <BreadcrumbPage className={isLightThemed ? "text-black" : "text-gray-100"}>Dashboard</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </header>
         
-        <div className="flex flex-1 flex-col gap-6 p-6 bg-white text-gray-900">
+        <div className={isLightThemed ? "flex flex-1 flex-col gap-6 p-6 bg-white text-gray-900" : "flex flex-1 flex-col gap-6 p-6 bg-gray-900 text-gray-100"}>
         {
           (pageState === possibleStates[0])
             ? <IdleComponent />

@@ -20,22 +20,17 @@ import { Eye , EyeOff} from 'lucide-react';
 
 export function LoginForm({
   className,
+  form,
   onShuffle,
   ...props
-}) {
-  const form = useForm({
-    defaultValues: {
-    username: '',
-    password: ''
-  }
-});
+}) 
+{
 
   const {message, setOpen, login, isOpen} = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
 
-
   return (
-    <div className={cn("flex flex-col gap-6 items-center justify-center w-full max-w-md h-[600px]", className)} {...props}>
+    <div className={cn("flex flex-col gap-6 items-center justify-center w-full max-w-md h-[37.5rem]", className)} {...props}>
       <Card className="w-full h-full flex flex-col justify-between">
         <CardHeader className="text-center" style={{ marginTop: '20%' }}>
           <CardTitle>Login to your account</CardTitle>

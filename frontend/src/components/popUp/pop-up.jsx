@@ -8,7 +8,7 @@ export default function Popup({
   message,
   isOpen,
   setOpenState,
-  duration = 1000,
+  duration = 10000,
   className,
 }) {
 

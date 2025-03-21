@@ -39,11 +39,12 @@ export default function AuthProvider({children})
           if (!response.ok) {
             setMessage(`${data.error.charAt(0).toUpperCase() + data.error.slice(1)}.`);
             setOpen(true);
+            return ("Error:" + error);
           }
         } 
         
         catch (error) {
-          console.error("Error:", error);
+          return ("Error:" + error);
         }
     
       };

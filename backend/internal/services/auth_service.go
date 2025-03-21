@@ -37,6 +37,15 @@ func (s *authService) Register(ctx context.Context, username, email, password st
 		return nil, ErrUsernameTaken
 	}
 
+	exists1, err1 := s.userService.ExistsByEmail(ctx, email)
+	if err1 != nil {
+		return nil, err1
+	}
+
+	if exists1 {
+		return nil, ErrEmailTaken
+	}
+
 	hashedPassword, err := utils.HashPassword(password)
 	if err != nil {
 		return nil, err

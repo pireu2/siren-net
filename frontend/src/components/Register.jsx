@@ -14,7 +14,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import Popup from "./popUp/pop-up";
 import { AuthContext } from "./auth/auth-handler";
 
-export function Register({ onShuffle }) {
+export function Register({ onShuffle, loginForm }) {
   const form = useForm({
     defaultValues: {
     username: '',
@@ -26,8 +26,19 @@ export function Register({ onShuffle }) {
 
   const {message, setOpen, register, isOpen} = useContext(AuthContext);
 
+  async function submitHandler(props)
+  {
+    const res = await register(props);
+    if(!res)
+    {
+      loginForm.setValue('username', props.username);
+      loginForm.setValue('password', props.password);
+      onShuffle();
+    }
+  }
+
   return (
-    <div className={cn("flex flex-col gap-6 items-center justify-center w-full max-w-md h-[600px]")}>
+    <div className={cn("flex flex-col gap-6 items-center justify-center w-full max-w-md h-[37.5rem]")}>
       <Card className="w-full h-full flex flex-col justify-between">
         <CardHeader className="text-center">
           <CardTitle>Create a new account</CardTitle>
@@ -38,7 +49,7 @@ export function Register({ onShuffle }) {
         </CardHeader>
         <CardContent className="flex-1 flex flex-col justify-center">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(register)} className="flex flex-col gap-6">
+            <form onSubmit={form.handleSubmit((p)=>submitHandler(p))} className="flex flex-col gap-6">
               <FormField
                 control={form.control}
                 name="username"

@@ -38,6 +38,16 @@ export default function Dashboard()
   useEffect(() => {
     localStorage.setItem('pageState', pageState);
     localStorage.setItem('theme', isLightThemed);
+
+    if(isLightThemed)
+    {
+      document.documentElement.classList.remove('dark');
+    }
+    else
+    {
+      document.documentElement.classList.add('dark');
+    }
+
   }, [pageState, isLightThemed]);
 
 
@@ -68,6 +78,7 @@ export default function Dashboard()
   //   };
   //   makeProtectedRequest();
   //   }, []);
+  
 
   function changeState(key)
   {
@@ -82,8 +93,8 @@ export default function Dashboard()
   {
     return(
       <>
-      <h1 className="text-3xl font-bold mb-4">Welcome to the <i>siren-net</i> Dashboard</h1>
-      <div className="grid gap-6 md:grid-cols-1">
+      <h1 className="text-3xl font-bold mb-4 ">Welcome to the <i>siren-net</i> Dashboard</h1>
+      <div className="grid gap-6 md:grid-cols-1 ">
         {dashboardSections.map((section) => (
           <TitleCard key={section.id} {...section} onClick = {()=> changeState(section.id)}/>
         ))}
@@ -91,6 +102,8 @@ export default function Dashboard()
       </>
     );
   }
+
+
 
 
   function PlaceHolder()
@@ -115,26 +128,25 @@ export default function Dashboard()
     (<SidebarProvider>
       <AppSidebar webState = {pageState} onStateChange = {arg => changeState(arg)}/>
       <SidebarInset>
-        <header className={isLightThemed ? "flex h-16 shrink-0 items-center gap-2 border-b px-4" : 
-          "flex h-16 shrink-0 items-center gap-2 border-b border-gray-700 px-4 bg-gray-900 text-gray-100"}>
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b border-gray-200 dark:border-gray-700 px-4 bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
           <Breadcrumb>
             <BreadcrumbList>
-            <BreadcrumbItem className={`hidden md:block ${!isLightThemed && "text-white"}`}>
-                <BreadcrumbLink onClick = {onLogout} className = {!isLightThemed && " hover:text-gray-400"}>
+            <BreadcrumbItem className="hidden md:block dark:text-white">
+                <BreadcrumbLink onClick = {onLogout} className = "dark:hover:text-gray-400">
                   Log-off
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block"/>
               <BreadcrumbItem>
-                <BreadcrumbPage className={isLightThemed ? "text-black" : "text-gray-100"}>Dashboard</BreadcrumbPage>
+                <BreadcrumbPage className="text-gray-100 dark:text-gray-500">Dashboard</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </header>
         
-        <div className={isLightThemed ? "flex flex-1 flex-col gap-6 p-6 bg-white text-gray-900" : "flex flex-1 flex-col gap-6 p-6 bg-gray-900 text-gray-100"}>
+        <div className="flex flex-1 flex-col gap-6 p-6 bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
         {
           (pageState === possibleStates[0])
             ? <IdleComponent />

@@ -57,16 +57,16 @@ export function AppSidebar({webState, onStateChange, ...props}) {
   }, [webState]);
 
   return (
-    (<Sidebar {...props}>
-      <SidebarHeader>
-        <SidebarMenu>
+    (<Sidebar {...props} className="bg-gray-900">
+      <SidebarHeader className="dark:bg-gray-900">
+        <SidebarMenu className="dark:bg-gray-900">
           <SidebarMenuItem>
             <SidebarMenuButton 
               size="lg" 
               asChild>
               <a href="#">
                 <div
-                  className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                  className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg dark:bg-gray-900">
                   <img src="src\images\sirennet.webp" alt="Siren Net" className="size-6" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
@@ -79,7 +79,7 @@ export function AppSidebar({webState, onStateChange, ...props}) {
         </SidebarMenu>
         <SearchForm />
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="dark:bg-gray-900">
         <SidebarMenu className="space-y-2">
           {data.navMain.map((item) => (
             <SidebarMenuItem key={item.title}>
@@ -90,6 +90,7 @@ export function AppSidebar({webState, onStateChange, ...props}) {
                   handleSectionChange(item.title); 
                   onStateChange(item.id);
                   }}>
+                
                 <div> {/* Aici se va pune Link penttru routing! */}
                   <item.icon className="mr-2 h-4 w-4" />
                   <span>{item.title}</span>
@@ -99,7 +100,7 @@ export function AppSidebar({webState, onStateChange, ...props}) {
           ))}
         </SidebarMenu>
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="dark:bg-gray-900"> 
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>

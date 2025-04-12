@@ -60,8 +60,8 @@ export default function AuthProvider({children})
         });
   
         const data = await response.json();
-
         if (response.ok) {
+          alert(`${formData.username} has logged in!`);
           const token = data.token;
           setUserToken(token);
           window.location.href = "/dashboard";
@@ -90,7 +90,7 @@ export default function AuthProvider({children})
     return(
         <>
         <AuthContext.Provider 
-        value={{login, logout, register, setMessage, isOpen,setOpen,message}}>
+        value={{login, logout, register, setMessage, isOpen,userToken,setOpen,message}}>
             {children}
         </AuthContext.Provider>
         </>

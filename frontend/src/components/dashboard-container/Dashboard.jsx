@@ -31,14 +31,14 @@ export default function Dashboard()
   });
 
   const possibleStates = {0:"idle", 1: "SD", 2:"AI", 3:"TP", 4:"AN"}
+  const [isLightThemed, setTheme] = useState(true);
+
   const {logout} = useContext(AuthContext);
 
-  const [isLightThemed, setTheme] = useState(false);
-
-  
   useEffect(() => {
     localStorage.setItem('pageState', pageState);
-  }, [pageState]);
+    localStorage.setItem('theme', isLightThemed);
+  }, [pageState, isLightThemed]);
 
 
   // useEffect(() => { 
@@ -140,7 +140,7 @@ export default function Dashboard()
             ? <IdleComponent />
             : 
             (pageState === possibleStates[1]) // pentru stable diffusion
-            ? <ImageGeneratorDashboard onBack = {()=> setState(possibleStates[0])}/>
+            ? <ImageGeneratorDashboard isLightThemed = {isLightThemed} onBack = {()=> setState(possibleStates[0])}/>
             :
             (pageState === possibleStates[2]) // pentru ai
             ? <AiPromptingDashboard onBack = {()=> setState(possibleStates[0])}/>

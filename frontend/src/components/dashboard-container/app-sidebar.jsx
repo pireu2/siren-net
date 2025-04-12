@@ -103,10 +103,10 @@ export function AppSidebar({webState, onStateChange, ...props}) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <a href="#">
+              <div>
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Settings</span>
-              </a>
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

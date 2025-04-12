@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 
-export default function ImageGeneratorDashboard({ onBack }) {
+export default function ImageGeneratorDashboard({ onBack, isLightThemed }) {
 
   const [prompt, setPrompt] = useState("")
   const [batchSize, setBatchSize] = useState("4")
@@ -24,7 +24,7 @@ export default function ImageGeneratorDashboard({ onBack }) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className={`flex flex-col min-h-screen ${isLightThemed ? "bg-gray-100" : "bg-gray-0"}`}>
       <div className="bg-white border-b p-4 flex items-center">
         <Button variant="ghost" className="mr-4" onClick={onBack}>
           <ArrowLeft className="h-5 w-5 mr-2" />
@@ -33,7 +33,7 @@ export default function ImageGeneratorDashboard({ onBack }) {
       </div>
 
 
-      <div className="flex-1 p-6 space-y-6">
+      <div className="flex-1 p-6 space-y-6 ">
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 

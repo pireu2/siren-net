@@ -59,3 +59,17 @@ func RegisterTransactionRoutes(router *gin.Engine, h *handlers.TransactionHandle
 		transactionGroup.DELETE("/:id", h.DeleteTransaction)
 	}
 }
+
+func RegisterMessageRoutes(router *gin.Engine, h *handlers.MessageHandler, m *middleware.AuthMiddleware) {
+	transactionGroup := router.Group("/messages")
+	transactionGroup.Use(m.JWTAuth())
+	{
+		transactionGroup.GET("/:id", h.GetMessageByID)
+		transactionGroup.GET("/client/:client_id", h.GetMessageByClientID)
+		transactionGroup.GET("/agent/:agent_id", h.GetMessageByAgentID)
+		transactionGroup.GET("/agent/:agent_id/client/:client_id", h.GetMessagesByAgentIDAndClientID)
+		transactionGroup.POST("", h.CreateMessage)
+		transactionGroup.PUT("/:id", h.UpdateMessage)
+		transactionGroup.DELETE("/:id", h.DeleteMessage)
+	}
+}

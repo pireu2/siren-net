@@ -6,6 +6,11 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	MessageTypeAgentToClient = "AGENT_TO_CLIENT"
+	MessageTypeClientToAgent = "CLIENT_TO_AGENT"
+)
+
 type Message struct {
 	gorm.Model
 	AgentID  uint   `gorm:"not null"`

@@ -26,12 +26,15 @@ func New() *Application {
 		userService,
 		&cfg,
 	)
+	agentService := services.NewAgentService(db)
 
 	authHandler := handlers.NewAuthHandler(authService)
+	agentHandler := handlers.NewAgentHandler(agentService)
 
 	router := gin.Default()
 
 	routes.RegisterAuthRoutes(router, authHandler, authMiddleware)
+	routes.RegisterAgentRoutes(router, agentHandler, authMiddleware)
 
 	return &Application{
 		Router: router,

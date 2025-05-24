@@ -31,6 +31,14 @@ func NewAuthMiddleware(cfg *config.Config, userService services.UserService) *Au
 	}
 }
 
+type contextKey string
+
+const (
+	UserKey     contextKey = "user"
+	UserIDKey   contextKey = "user-id"
+	UsernameKey contextKey = "username"
+)
+
 func (m *AuthMiddleware) JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHandler := c.GetHeader("Authorization")
@@ -65,8 +73,27 @@ func (m *AuthMiddleware) JWTAuth() gin.HandlerFunc {
 			return
 		}
 
-		ctx = context.WithValue(ctx, "user", user)
+		ctx = context.WithValue(ctx, UserIDKey, claims.UserID)
+		ctx = context.WithValue(ctx, UsernameKey, claims.Username)
+
+		c.Set(string(UserIDKey), claims.UserID)
+		ctx = context.WithValue(ctx, UserKey, user)
+
 		c.Request = c.Request.WithContext(ctx)
 		c.Next()
 	}
+}
+
+func GetLoggedInUserID(c *gin.Context) (uint, error) {
+	userID, ok := c.Get(string(UserIDKey))
+	if !ok {
+		return 0, errors.New("user ID not found in context")
+	}
+
+	id, ok := userID.(uint)
+	if !ok {
+		return 0, errors.New("user ID is not of type uint")
+	}
+
+	return id, nil
 }

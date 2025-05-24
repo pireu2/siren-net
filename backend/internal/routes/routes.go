@@ -45,3 +45,17 @@ func RegisterClientRoutes(router *gin.Engine, h *handlers.ClientHandler, m *midd
 		clientGroup.DELETE("/:id", h.DeleteClient)
 	}
 }
+
+func RegisterTransactionRoutes(router *gin.Engine, h *handlers.TransactionHandler, m *middleware.AuthMiddleware) {
+	transactionGroup := router.Group("/transactions")
+	transactionGroup.Use(m.JWTAuth())
+	{
+		transactionGroup.GET("/:id", h.GetTransactionByID)
+		transactionGroup.GET("/client/:client_id", h.GetTransactionsByClientID)
+		transactionGroup.GET("/agent/:agent_id", h.GetTransactionsByAgentID)
+		transactionGroup.GET("/agent/:agent_id/client/:client_id", h.GetTransactionsByAgentIDAndClientID)
+		transactionGroup.POST("", h.CreateTransaction)
+		transactionGroup.PUT("/:id", h.UpdateTransaction)
+		transactionGroup.DELETE("/:id", h.DeleteTransaction)
+	}
+}

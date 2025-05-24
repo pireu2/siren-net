@@ -198,7 +198,7 @@ func (h *MessageHandler) CreateMessage(c *gin.Context) {
 		Type     string    `json:"type" binding:"required"`
 		AgentID  string    `json:"agent_id" binding:"required"`
 		ClientID string    `json:"client_id" binding:"required"`
-		Date     time.Time `json:"date"` // Optional, will be set to current time if not provided
+		Date     time.Time `json:"date"`
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -220,7 +220,6 @@ func (h *MessageHandler) CreateMessage(c *gin.Context) {
 		}
 	}
 
-	// Validate message type
 	if input.Type != models.MessageTypeAgentToClient && input.Type != models.MessageTypeClientToAgent {
 		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidMessageType)
 		return

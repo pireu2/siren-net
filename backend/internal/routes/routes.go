@@ -33,3 +33,15 @@ func RegisterAgentRoutes(router *gin.Engine, h *handlers.AgentHandler, m *middle
 		agentGroup.DELETE("/:id", h.DeleteAgent)
 	}
 }
+
+func RegisterClientRoutes(router *gin.Engine, h *handlers.ClientHandler, m *middleware.AuthMiddleware) {
+	clientGroup := router.Group("/clients")
+	clientGroup.Use(m.JWTAuth())
+	{
+		clientGroup.GET("/:id", h.GetClientByID)
+		clientGroup.GET("", h.GetClientsByAgentID)
+		clientGroup.POST("", h.CreateClient)
+		clientGroup.PUT("/:id", h.UpdateClient)
+		clientGroup.DELETE("/:id", h.DeleteClient)
+	}
+}

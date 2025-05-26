@@ -39,7 +39,7 @@ func RegisterClientRoutes(router *gin.Engine, h *handlers.ClientHandler, m *midd
 	clientGroup.Use(m.JWTAuth())
 	{
 		clientGroup.GET("/:id", h.GetClientByID)
-		clientGroup.GET("", h.GetClientsByAgentID)
+		clientGroup.GET("/agent/:agent_id", h.GetClientsByAgentID)
 		clientGroup.POST("", h.CreateClient)
 		clientGroup.PUT("/:id", h.UpdateClient)
 		clientGroup.DELETE("/:id", h.DeleteClient)
@@ -61,15 +61,15 @@ func RegisterTransactionRoutes(router *gin.Engine, h *handlers.TransactionHandle
 }
 
 func RegisterMessageRoutes(router *gin.Engine, h *handlers.MessageHandler, m *middleware.AuthMiddleware) {
-	transactionGroup := router.Group("/messages")
-	transactionGroup.Use(m.JWTAuth())
+	messageGroup := router.Group("/messages")
+	messageGroup.Use(m.JWTAuth())
 	{
-		transactionGroup.GET("/:id", h.GetMessageByID)
-		transactionGroup.GET("/client/:client_id", h.GetMessageByClientID)
-		transactionGroup.GET("/agent/:agent_id", h.GetMessageByAgentID)
-		transactionGroup.GET("/agent/:agent_id/client/:client_id", h.GetMessagesByAgentIDAndClientID)
-		transactionGroup.POST("", h.CreateMessage)
-		transactionGroup.PUT("/:id", h.UpdateMessage)
-		transactionGroup.DELETE("/:id", h.DeleteMessage)
+		messageGroup.GET("/:id", h.GetMessageByID)
+		messageGroup.GET("/client/:client_id", h.GetMessageByClientID)
+		messageGroup.GET("/agent/:agent_id", h.GetMessageByAgentID)
+		messageGroup.GET("/agent/:agent_id/client/:client_id", h.GetMessagesByAgentIDAndClientID)
+		messageGroup.POST("", h.CreateMessage)
+		messageGroup.PUT("/:id", h.UpdateMessage)
+		messageGroup.DELETE("/:id", h.DeleteMessage)
 	}
 }

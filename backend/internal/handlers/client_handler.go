@@ -22,18 +22,13 @@ func NewClientHandler(clientService services.ClientService) *ClientHandler {
 }
 
 func (h *ClientHandler) GetClientByID(c *gin.Context) {
-	var input struct {
-		ID string `json:"id" binding:"required"`
+	idParam := c.Param("id")
+	if idParam == "" {
+		services.RespondError(c, http.StatusBadRequest, services.ErrClientIDRequired)
+		return
 	}
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		if input.ID == "" {
-			services.RespondError(c, http.StatusBadRequest, services.ErrClientIDRequired)
-			return
-		}
-	}
-
-	clientID, err := strconv.ParseUint(input.ID, 10, 32)
+	clientID, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
 		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidClientID)
 		return
@@ -59,18 +54,13 @@ func (h *ClientHandler) GetClientByID(c *gin.Context) {
 }
 
 func (h *ClientHandler) GetClientsByAgentID(c *gin.Context) {
-	var input struct {
-		AgentID string `json:"agent_id" binding:"required"`
+	agentIDParam := c.Param("agent_id")
+	if agentIDParam == "" {
+		services.RespondError(c, http.StatusBadRequest, services.ErrAgentIDRequired)
+		return
 	}
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		if input.AgentID == "" {
-			services.RespondError(c, http.StatusBadRequest, services.ErrAgentIDRequired)
-			return
-		}
-	}
-
-	agentID, err := strconv.ParseUint(input.AgentID, 10, 32)
+	agentID, err := strconv.ParseUint(agentIDParam, 10, 32)
 	if err != nil {
 		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidAgentID)
 		return
@@ -213,18 +203,13 @@ func (h *ClientHandler) UpdateClient(c *gin.Context) {
 }
 
 func (h *ClientHandler) DeleteClient(c *gin.Context) {
-	var input struct {
-		ID string `json:"id" binding:"required"`
+	idParam := c.Param("id")
+	if idParam == "" {
+		services.RespondError(c, http.StatusBadRequest, services.ErrClientIDRequired)
+		return
 	}
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		if input.ID == "" {
-			services.RespondError(c, http.StatusBadRequest, services.ErrClientIDRequired)
-			return
-		}
-	}
-
-	clientID, err := strconv.ParseUint(input.ID, 10, 32)
+	clientID, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
 		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidClientID)
 		return

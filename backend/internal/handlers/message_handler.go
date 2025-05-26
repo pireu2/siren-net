@@ -22,18 +22,13 @@ func NewMessageHandler(messageService services.MessageService) *MessageHandler {
 }
 
 func (h *MessageHandler) GetMessageByID(c *gin.Context) {
-	var input struct {
-		ID string `json:"id" binding:"required"`
+	idParam := c.Param("id")
+	if idParam == "" {
+		services.RespondError(c, http.StatusBadRequest, services.ErrMessageIDRequired)
+		return
 	}
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		if input.ID == "" {
-			services.RespondError(c, http.StatusBadRequest, services.ErrMessageIDRequired)
-			return
-		}
-	}
-
-	messageID, err := strconv.ParseUint(input.ID, 10, 32)
+	messageID, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
 		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidMessageID)
 		return
@@ -63,18 +58,13 @@ func (h *MessageHandler) GetMessageByID(c *gin.Context) {
 }
 
 func (h *MessageHandler) GetMessageByAgentID(c *gin.Context) {
-	var input struct {
-		AgentID string `json:"agent_id" binding:"required"`
+	agentIDParam := c.Param("agent_id")
+	if agentIDParam == "" {
+		services.RespondError(c, http.StatusBadRequest, services.ErrAgentIDRequired)
+		return
 	}
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		if input.AgentID == "" {
-			services.RespondError(c, http.StatusBadRequest, services.ErrAgentIDRequired)
-			return
-		}
-	}
-
-	agentID, err := strconv.ParseUint(input.AgentID, 10, 32)
+	agentID, err := strconv.ParseUint(agentIDParam, 10, 32)
 	if err != nil {
 		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidAgentID)
 		return
@@ -104,18 +94,13 @@ func (h *MessageHandler) GetMessageByAgentID(c *gin.Context) {
 }
 
 func (h *MessageHandler) GetMessageByClientID(c *gin.Context) {
-	var input struct {
-		ClientID string `json:"client_id" binding:"required"`
+	clientIDParam := c.Param("client_id")
+	if clientIDParam == "" {
+		services.RespondError(c, http.StatusBadRequest, services.ErrClientIDRequired)
+		return
 	}
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		if input.ClientID == "" {
-			services.RespondError(c, http.StatusBadRequest, services.ErrClientIDRequired)
-			return
-		}
-	}
-
-	clientID, err := strconv.ParseUint(input.ClientID, 10, 32)
+	clientID, err := strconv.ParseUint(clientIDParam, 10, 32)
 	if err != nil {
 		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidClientID)
 		return
@@ -145,29 +130,25 @@ func (h *MessageHandler) GetMessageByClientID(c *gin.Context) {
 }
 
 func (h *MessageHandler) GetMessagesByAgentIDAndClientID(c *gin.Context) {
-	var input struct {
-		AgentID  string `json:"agent_id" binding:"required"`
-		ClientID string `json:"client_id" binding:"required"`
+	agentIDParam := c.Param("agent_id")
+	if agentIDParam == "" {
+		services.RespondError(c, http.StatusBadRequest, services.ErrAgentIDRequired)
+		return
 	}
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		if input.AgentID == "" {
-			services.RespondError(c, http.StatusBadRequest, services.ErrAgentIDRequired)
-			return
-		}
-		if input.ClientID == "" {
-			services.RespondError(c, http.StatusBadRequest, services.ErrClientIDRequired)
-			return
-		}
+	clientIDParam := c.Param("client_id")
+	if clientIDParam == "" {
+		services.RespondError(c, http.StatusBadRequest, services.ErrClientIDRequired)
+		return
 	}
 
-	agentID, err := strconv.ParseUint(input.AgentID, 10, 32)
+	agentID, err := strconv.ParseUint(agentIDParam, 10, 32)
 	if err != nil {
 		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidAgentID)
 		return
 	}
 
-	clientID, err := strconv.ParseUint(input.ClientID, 10, 32)
+	clientID, err := strconv.ParseUint(clientIDParam, 10, 32)
 	if err != nil {
 		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidClientID)
 		return
@@ -276,23 +257,26 @@ func (h *MessageHandler) CreateMessage(c *gin.Context) {
 }
 
 func (h *MessageHandler) UpdateMessage(c *gin.Context) {
+	idParam := c.Param("id")
+	if idParam == "" {
+		services.RespondError(c, http.StatusBadRequest, services.ErrMessageIDRequired)
+		return
+	}
+
+	messageID, err := strconv.ParseUint(idParam, 10, 32)
+	if err != nil {
+		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidMessageID)
+		return
+	}
+
 	var input struct {
-		ID      string    `json:"id" binding:"required"`
 		Content string    `json:"content"`
 		Type    string    `json:"type"`
 		Date    time.Time `json:"date"`
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
-		if input.ID == "" {
-			services.RespondError(c, http.StatusBadRequest, services.ErrMessageIDRequired)
-			return
-		}
-	}
-
-	messageID, err := strconv.ParseUint(input.ID, 10, 32)
-	if err != nil {
-		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidMessageID)
+		services.RespondError(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -333,18 +317,13 @@ func (h *MessageHandler) UpdateMessage(c *gin.Context) {
 }
 
 func (h *MessageHandler) DeleteMessage(c *gin.Context) {
-	var input struct {
-		ID string `json:"id" binding:"required"`
+	idParam := c.Param("id")
+	if idParam == "" {
+		services.RespondError(c, http.StatusBadRequest, services.ErrMessageIDRequired)
+		return
 	}
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		if input.ID == "" {
-			services.RespondError(c, http.StatusBadRequest, services.ErrMessageIDRequired)
-			return
-		}
-	}
-
-	messageID, err := strconv.ParseUint(input.ID, 10, 32)
+	messageID, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
 		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidMessageID)
 		return

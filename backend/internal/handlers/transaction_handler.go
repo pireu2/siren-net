@@ -22,18 +22,13 @@ func NewTransactionHandler(transactionService services.TransactionService) *Tran
 }
 
 func (h *TransactionHandler) GetTransactionByID(c *gin.Context) {
-	var input struct {
-		ID string `json:"id" binding:"required"`
+	idParam := c.Param("id")
+	if idParam == "" {
+		services.RespondError(c, http.StatusBadRequest, services.ErrTransactionIDRequired)
+		return
 	}
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		if input.ID == "" {
-			services.RespondError(c, http.StatusBadRequest, services.ErrTransactionIDRequired)
-			return
-		}
-	}
-
-	transactionID, err := strconv.ParseUint(input.ID, 10, 32)
+	transactionID, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
 		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidTransactionID)
 		return
@@ -63,18 +58,13 @@ func (h *TransactionHandler) GetTransactionByID(c *gin.Context) {
 }
 
 func (h *TransactionHandler) GetTransactionsByAgentID(c *gin.Context) {
-	var input struct {
-		AgentID string `json:"agent_id" binding:"required"`
+	agentIDParam := c.Param("agent_id")
+	if agentIDParam == "" {
+		services.RespondError(c, http.StatusBadRequest, services.ErrAgentIDRequired)
+		return
 	}
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		if input.AgentID == "" {
-			services.RespondError(c, http.StatusBadRequest, services.ErrAgentIDRequired)
-			return
-		}
-	}
-
-	agentID, err := strconv.ParseUint(input.AgentID, 10, 32)
+	agentID, err := strconv.ParseUint(agentIDParam, 10, 32)
 	if err != nil {
 		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidAgentID)
 		return
@@ -100,18 +90,13 @@ func (h *TransactionHandler) GetTransactionsByAgentID(c *gin.Context) {
 }
 
 func (h *TransactionHandler) GetTransactionsByClientID(c *gin.Context) {
-	var input struct {
-		ClientID string `json:"client_id" binding:"required"`
+	clientIDParam := c.Param("client_id")
+	if clientIDParam == "" {
+		services.RespondError(c, http.StatusBadRequest, services.ErrClientIDRequired)
+		return
 	}
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		if input.ClientID == "" {
-			services.RespondError(c, http.StatusBadRequest, services.ErrClientIDRequired)
-			return
-		}
-	}
-
-	clientID, err := strconv.ParseUint(input.ClientID, 10, 32)
+	clientID, err := strconv.ParseUint(clientIDParam, 10, 32)
 	if err != nil {
 		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidClientID)
 		return
@@ -137,29 +122,25 @@ func (h *TransactionHandler) GetTransactionsByClientID(c *gin.Context) {
 }
 
 func (h *TransactionHandler) GetTransactionsByAgentIDAndClientID(c *gin.Context) {
-	var input struct {
-		AgentID  string `json:"agent_id" binding:"required"`
-		ClientID string `json:"client_id" binding:"required"`
+	agentIDParam := c.Param("agent_id")
+	if agentIDParam == "" {
+		services.RespondError(c, http.StatusBadRequest, services.ErrAgentIDRequired)
+		return
 	}
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		if input.AgentID == "" {
-			services.RespondError(c, http.StatusBadRequest, services.ErrAgentIDRequired)
-			return
-		}
-		if input.ClientID == "" {
-			services.RespondError(c, http.StatusBadRequest, services.ErrClientIDRequired)
-			return
-		}
+	clientIDParam := c.Param("client_id")
+	if clientIDParam == "" {
+		services.RespondError(c, http.StatusBadRequest, services.ErrClientIDRequired)
+		return
 	}
 
-	agentID, err := strconv.ParseUint(input.AgentID, 10, 32)
+	agentID, err := strconv.ParseUint(agentIDParam, 10, 32)
 	if err != nil {
 		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidAgentID)
 		return
 	}
 
-	clientID, err := strconv.ParseUint(input.ClientID, 10, 32)
+	clientID, err := strconv.ParseUint(clientIDParam, 10, 32)
 	if err != nil {
 		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidClientID)
 		return
@@ -254,17 +235,24 @@ func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 }
 
 func (h *TransactionHandler) UpdateTransaction(c *gin.Context) {
+	idParam := c.Param("id")
+	if idParam == "" {
+		services.RespondError(c, http.StatusBadRequest, services.ErrTransactionIDRequired)
+		return
+	}
+
+	transactionID, err := strconv.ParseUint(idParam, 10, 32)
+	if err != nil {
+		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidTransactionID)
+		return
+	}
+
 	var input struct {
-		ID     string    `json:"id" binding:"required"`
 		Amount float64   `json:"amount" binding:"required"`
 		Date   time.Time `json:"date" binding:"required"`
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
-		if input.ID == "" {
-			services.RespondError(c, http.StatusBadRequest, services.ErrTransactionIDRequired)
-			return
-		}
 		if input.Amount == 0 {
 			services.RespondError(c, http.StatusBadRequest, services.ErrAmountRequired)
 			return
@@ -273,12 +261,6 @@ func (h *TransactionHandler) UpdateTransaction(c *gin.Context) {
 			services.RespondError(c, http.StatusBadRequest, services.ErrInvalidDate)
 			return
 		}
-	}
-
-	transactionID, err := strconv.ParseUint(input.ID, 10, 32)
-	if err != nil {
-		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidTransactionID)
-		return
 	}
 
 	loggedInUserID, err := middleware.GetLoggedInUserID(c)
@@ -317,18 +299,13 @@ func (h *TransactionHandler) UpdateTransaction(c *gin.Context) {
 }
 
 func (h *TransactionHandler) DeleteTransaction(c *gin.Context) {
-	var input struct {
-		ID string `json:"id" binding:"required"`
+	idParam := c.Param("id")
+	if idParam == "" {
+		services.RespondError(c, http.StatusBadRequest, services.ErrTransactionIDRequired)
+		return
 	}
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		if input.ID == "" {
-			services.RespondError(c, http.StatusBadRequest, services.ErrTransactionIDRequired)
-			return
-		}
-	}
-
-	transactionID, err := strconv.ParseUint(input.ID, 10, 32)
+	transactionID, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
 		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidTransactionID)
 		return

@@ -21,18 +21,13 @@ func NewAgentHandler(agentService services.AgentService) *AgentHandler {
 }
 
 func (h *AgentHandler) GetAgentByID(c *gin.Context) {
-	var input struct {
-		ID string `json:"id" binding:"required"`
+	idParam := c.Param("id")
+	if idParam == "" {
+		services.RespondError(c, http.StatusBadRequest, services.ErrAgentIDRequired)
+		return
 	}
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		if input.ID == "" {
-			services.RespondError(c, http.StatusBadRequest, services.ErrAgentIDRequired)
-			return
-		}
-	}
-
-	agentID, err := strconv.ParseUint(input.ID, 10, 32)
+	agentID, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
 		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidAgentID)
 		return
@@ -115,17 +110,24 @@ func (h *AgentHandler) CreateAgent(c *gin.Context) {
 }
 
 func (h *AgentHandler) UpdateAgent(c *gin.Context) {
+	idParam := c.Param("id")
+	if idParam == "" {
+		services.RespondError(c, http.StatusBadRequest, services.ErrAgentIDRequired)
+		return
+	}
+
+	agentID, err := strconv.ParseUint(idParam, 10, 32)
+	if err != nil {
+		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidAgentID)
+		return
+	}
+
 	var input struct {
-		ID              uint   `json:"id" binding:"required"`
 		Name            string `json:"name" binding:"required"`
 		Characteristics string `json:"characteristics" binding:"required"`
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
-		if input.ID == 0 {
-			services.RespondError(c, http.StatusBadRequest, services.ErrAgentIDRequired)
-			return
-		}
 		if input.Name == "" {
 			services.RespondError(c, http.StatusBadRequest, services.ErrAgentNameRequired)
 			return
@@ -146,7 +148,7 @@ func (h *AgentHandler) UpdateAgent(c *gin.Context) {
 
 	agent := &models.Agent{
 		Model: gorm.Model{
-			ID: input.ID,
+			ID: uint(agentID),
 		},
 		Name:            input.Name,
 		Characteristics: input.Characteristics,
@@ -171,18 +173,13 @@ func (h *AgentHandler) UpdateAgent(c *gin.Context) {
 }
 
 func (h *AgentHandler) DeleteAgent(c *gin.Context) {
-	var input struct {
-		ID string `json:"id" binding:"required"`
+	idParam := c.Param("id")
+	if idParam == "" {
+		services.RespondError(c, http.StatusBadRequest, services.ErrAgentIDRequired)
+		return
 	}
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		if input.ID == "" {
-			services.RespondError(c, http.StatusBadRequest, services.ErrAgentIDRequired)
-			return
-		}
-	}
-
-	agentID, err := strconv.ParseUint(input.ID, 10, 32)
+	agentID, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
 		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidAgentID)
 		return

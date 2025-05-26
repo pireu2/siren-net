@@ -14,12 +14,27 @@ export default defineConfig({
   server: {
     proxy: {
       "/auth": {
-        target: "http://localhost:8080", // Backendul in go
+        target: "http://localhost:8080", 
         changeOrigin: true,
         secure: false,
       },
       "/protected": {
-        target: "http://localhost:8080", // Backendul in go
+        target: "http://localhost:8080", 
+        changeOrigin: true,
+        secure: false,
+      },
+       "/client": {
+        target: "http://localhost:8080", 
+        changeOrigin: true,
+        secure: false,
+      },
+      "/agents": {
+        target: "http://localhost:8080", 
+        changeOrigin: true,
+        secure: false,
+      },
+      "/messages": {
+        target: "http://localhost:8080", 
         changeOrigin: true,
         secure: false,
       },

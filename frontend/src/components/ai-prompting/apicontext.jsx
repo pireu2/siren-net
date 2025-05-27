@@ -59,8 +59,48 @@ export function ApiProvider({ children }) {
     }
   };
 
+  const getTransactions = async (agentId, clientId) => {
+  if (!agentId || !clientId) return [];
+  
+  try {
+    const response = await fetch(
+      `/transactions/agent/${agentId}/client/${clientId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      }
+    );
+    
+    // Check response status first
+    if (!response.ok) {
+      console.error(`Transaction API error: ${response.status} ${response.statusText}`);
+      return [];
+    }
+    
+    // Try to parse as JSON safely
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      return await response.json();
+    } else {
+      // If not JSON, log the issue
+      const text = await response.text();
+      console.error("API returned non-JSON response:", text.substring(0, 100) + "...");
+      return [];
+    }
+  } catch (error) {
+    console.error("Error fetching transactions:", error);
+    return [];
+  }
+};
+
+
+  
+
   return (
-    <ApiContext.Provider value={{ getClients, getAgents, getConversations }}>
+    <ApiContext.Provider value={{ getClients, getAgents, getConversations, getTransactions }}>
       {children}
     </ApiContext.Provider>
   );

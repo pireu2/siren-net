@@ -37,132 +37,212 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 import { useEffect } from "react";
+import { useApi } from "@/components/ai-prompting/ApiContext"
 
-import ApiContext from './ApiContext';
-import { useContext } from "react";
 
-// Mock data
-const agents = [
-  { id: 1, name: "Sales Agent Alpha", status: "active", clientCount: 12 },
-  { id: 2, name: "Support Agent Beta", status: "active", clientCount: 8 },
-  { id: 3, name: "Marketing Agent Gamma", status: "inactive", clientCount: 15 },
-  { id: 4, name: "Customer Success Delta", status: "active", clientCount: 6 },
-]
-
-const symmetryData = [
-  { client: "Client A", ratio: 0.8 },
-  { client: "Client B", ratio: 1.2 },
-  { client: "Client C", ratio: 0.6 },
-  { client: "Client D", ratio: 1.5 },
-  { client: "Client E", ratio: 0.9 },
-]
-
-const messageGapData = [
-  { day: "Mon", avgGap: 2.5 },
-  { day: "Tue", avgGap: 3.2 },
-  { day: "Wed", avgGap: 1.8 },
-  { day: "Thu", avgGap: 4.1 },
-  { day: "Fri", avgGap: 2.9 },
-  { day: "Sat", avgGap: 5.2 },
-  { day: "Sun", avgGap: 6.1 },
-]
-
-const transactionData = [
-  { client: "Client A", ratio: 0.15, amount: 5000, x: 1, y: 0.15 },
-  { client: "Client B", ratio: 0.25, amount: 8000, x: 2, y: 0.25 },
-  { client: "Client C", ratio: 0.08, amount: 2000, x: 3, y: 0.08 },
-  { client: "Client D", ratio: 0.35, amount: 12000, x: 4, y: 0.35 },
-  { client: "Client E", ratio: 0.18, amount: 6500, x: 5, y: 0.18 },
-]
-
-const clientPerformanceData = [
-  {
-    id: 1,
-    name: "Client A",
-    score: 85,
-    symmetryRatio: 0.8,
-    avgMsgGap: 2.5,
-    txRatio: 0.15,
-    status: "excellent",
-  },
-  {
-    id: 2,
-    name: "Client B",
-    score: 72,
-    symmetryRatio: 1.2,
-    avgMsgGap: 3.2,
-    txRatio: 0.25,
-    status: "good",
-  },
-  {
-    id: 3,
-    name: "Client C",
-    score: 58,
-    symmetryRatio: 0.6,
-    avgMsgGap: 1.8,
-    txRatio: 0.08,
-    status: "needs attention",
-  },
-  {
-    id: 4,
-    name: "Client D",
-    score: 91,
-    symmetryRatio: 1.5,
-    avgMsgGap: 4.1,
-    txRatio: 0.35,
-    status: "excellent",
-  },
-  {
-    id: 5,
-    name: "Client E",
-    score: 67,
-    symmetryRatio: 0.9,
-    avgMsgGap: 2.9,
-    txRatio: 0.18,
-    status: "good",
-  },
-]
-
-const timelineData = [
-  { time: "09:00", sender: "agent", type: "normal", message: "Good morning! How can I help?" },
-  { time: "09:15", sender: "client", type: "normal", message: "Hi, I have a question about pricing" },
-  { time: "09:18", sender: "agent", type: "normal", message: "I'd be happy to help with that" },
-  { time: "09:45", sender: "client", type: "transaction", message: "I'd like to proceed with the purchase" },
-  { time: "10:00", sender: "agent", type: "transaction", message: "Great! Let me process that for you" },
-  { time: "10:30", sender: "client", type: "emotional", message: "Thank you so much for your help!" },
-]
+// const timelineData = [
+//   { time: "09:00", sender: "agent", type: "normal", message: "Good morning! How can I help?" },
+//   { time: "09:15", sender: "client", type: "normal", message: "Hi, I have a question about pricing" },
+//   { time: "09:18", sender: "agent", type: "normal", message: "I'd be happy to help with that" },
+//   { time: "09:45", sender: "client", type: "transaction", message: "I'd like to proceed with the purchase" },
+//   { time: "10:00", sender: "agent", type: "transaction", message: "Great! Let me process that for you" },
+//   { time: "10:30", sender: "client", type: "emotional", message: "Thank you so much for your help!" },
+// ]
 
 export default function AIAgentDashboard({onBack}) {
-  const [selectedAgent, setSelectedAgent] = useState(agents[0])
-  const [expandedClient, setExpandedClient] = useState(null)
-  const { getClients, getAgents, getConversations } = useContext(ApiContext);
+const [agents, setAgents] = useState([]);
+const [selectedAgent, setSelectedAgent] = useState(agents[0] || { id: null, name: "Select an agent", clientCount: 0, status: "active" });
+const [expandedClient, setExpandedClient] = useState(null);
+const [symmetryData, setSymmetryData] = useState([]);
+const [messageGapData, setMessageGapData] = useState([]);
+const [transactionData, setTransactionData] = useState([]);
+const [totalRevenue, setTotalRevenue] = useState(0);
+const [clientPerformanceData, setClientPerformanceData] = useState([]);
+const [timelineData, setTimelineData] = useState([]);
+const { getClients, getAgents, getConversations, getTransactions } = useApi();
 
-    useEffect(() => { 
-         
-      }, []);
+        async function fetchAgents() {
+            try {
+                const agentsData = await getAgents();
+                const mappedAgents = await Promise.all(
+                    agentsData.map(async (agent) => {
+                        const agentClients = await getClients(agent.ID);
+                        return {
+                            id: agent.ID,
+                            name: agent.Name,
+                            status: agent.status || "active",
+                            clientCount: Array.isArray(agentClients) ? agentClients.length : 0,
+                        };
+                    })
+                );
+                setAgents(mappedAgents);
+                if (mappedAgents.length > 0 && !selectedAgent.id) {
+                    setSelectedAgent(mappedAgents[0]);
+                    fetchDataForAgent(mappedAgents[0].id);
+                }
+                
+            } catch (err) {
+                console.error("Error fetching agents or clients:", err);
+            }
+        }
+
+
+        async function fetchDataForAgent(agentId) {
+            try {
+            const clientData = await getClients(agentId);
+            console.log("Client Data fetched:", clientData);
+            var symmetry = [];
+            var timeGapsByDay = [];
+            var transactionArr = [];
+            var ClientPerformance = [];
+            let transactionX = 0; 
+            let totalRevenueLocal = 0;
+            let timeLineDataLocal = [];
+            let MaxScore = -1;
+            let bestClientData = null;
+
+                for(var client of clientData)
+                {
+                    var clientTransaction = 0;
+                    await getTransactions(agentId, client.ID).then((transactions) => 
+                    {
+                        clientTransaction = transactions.length;
+                        totalRevenueLocal += transactions.reduce((sum, transaction) => sum + (transaction.Amount || 0), 0);
+                    })
+
+                    if(client.Score > MaxScore) 
+                        {
+                            MaxScore = client.Score;
+                            bestClientData = client;
+                        };
+
+                    await getConversations(agentId, client.ID).then((conversationsClient) => {
+                        let agentToClient = 0;
+                        let clientToAgent = 0;
+
+                        const getDayAbbreviation = (dateObj) => {
+                        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                        return days[dateObj.getDay()];
+                        };
+
+                        const sortedConvs = [...conversationsClient].sort(
+                          (a, b) => new Date(a.CreatedAt) - new Date(b.CreatedAt)
+                        );
+
+                        const gapsByDay = {};
+
+                        for (let i = 1; i < sortedConvs.length; i++) {
+                          const prev = new Date(sortedConvs[i - 1].CreatedAt);
+                          const curr = new Date(sortedConvs[i].CreatedAt);
+                          const dayOfWeek = getDayAbbreviation(curr);
+                          
+                          const gapMs = curr - prev;
+                          const gapHours = gapMs / (1000 * 60 * 60);
+                          if (!gapsByDay[dayOfWeek]) {
+                            gapsByDay[dayOfWeek] = [];
+                        }
+                        gapsByDay[dayOfWeek].push(gapHours);
+                        
+                        }
+
+
+                        conversationsClient.forEach(conv => {
+                            if (conv.Type === "AGENT_TO_CLIENT") agentToClient++;
+                            else if (conv.Type === "CLIENT_TO_AGENT") clientToAgent++;
+                        });
+                        let ratio = clientToAgent === 0 ? 0 : agentToClient / clientToAgent;
+                        symmetry.push({ client: client.Name, ratio});
+
+                        transactionArr.push({
+                        client: client.Name,
+                        ratio: (clientTransaction / conversationsClient.length).toFixed(3), 
+                        amount: clientTransaction,
+                        x: transactionX++,
+                        y: (clientTransaction / conversationsClient.length).toFixed(3) 
+                        });
+
+                        ClientPerformance.push({
+                            id: client.ID,
+                            name: client.Name,
+                            score: client.Score, 
+                            symmetryRatio: ratio,
+                            avgMsgGap: (Object.values(gapsByDay)
+                            .flat()
+                            .reduce((sum, gap) => sum + gap, 0) / 
+                            Object.values(gapsByDay).flat().length).toFixed(2) || 0,
+                            txRatio: (clientTransaction / conversationsClient.length).toFixed(3),
+                            status: clientTransaction > 1 ? "excellent" : clientTransaction > 2 ? "not important" : "needs attention",
+                        });
+
+                       for (const day in gapsByDay) {
+                        const dayGaps = gapsByDay[day];
+                        const avgGap = dayGaps.reduce((a, b) => a + b, 0) / dayGaps.length;
+                        
+                        timeGapsByDay.push({
+                            day: day,
+                            avgGap: avgGap.toFixed(3)
+                        });
+                        }
+                    });
+                }
+                var formattedTimelineData = [];
+                if (bestClientData) {
+                const bestClientConvs = await getConversations(agentId, bestClientData.ID);
+                formattedTimelineData = bestClientConvs.map((conv) => {
+                    const time = new Date(conv.CreatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    return {
+                        time,
+                        sender: conv.Type === "AGENT_TO_CLIENT" ? "agent" : "client",
+                        type: conv.Type === "TRANSACTION" ? "transaction" : conv.Type === "EMOTIONAL" ? "emotional" : "normal",
+                        message: conv.Content || "",
+                    };
+                });
+                }
+
+
+                const groupedByDay = {};
+                timeGapsByDay.forEach(({ day, avgGap }) => {
+                  if (!groupedByDay[day]) groupedByDay[day] = [];
+                  groupedByDay[day].push(Number(avgGap));
+                });
+
+                const averagedByDay = Object.entries(groupedByDay).map(([day, gaps]) => ({
+                  day,
+                  avgGap: gaps.reduce((a, b) => a + b, 0) / gaps.length,
+                }));
+                console.log("performance data:", ClientPerformance);
+                setClientPerformanceData(ClientPerformance);
+                setTransactionData(transactionArr);
+                setMessageGapData(averagedByDay);
+                setSymmetryData(symmetry);
+                console.log("timeLineDataLocal:", timeLineDataLocal);
+                setTotalRevenue(totalRevenueLocal);
+                setTimelineData(formattedTimelineData);
+            
+            } catch (err) {
+                console.error("Error fetching agents or clients:", err);
+            }
+        }
+    
+
+    
+    useEffect(() => {
+        fetchAgents();
+    }, []);
 
 
   const getScoreBadgeVariant = (score) => {
-    if (score >= 80) return "default"
-    if (score >= 60) return "secondary"
+    if (score >= 4) return "default"
+    if (score >= 2) return "secondary"
     return "destructive"
   }
 
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "excellent":
-        return "text-green-600"
-      case "good":
-        return "text-blue-600"
-      case "needs attention":
-        return "text-orange-600"
-      default:
-        return "text-gray-600"
+    if(!selectedAgent.id)
+    {
+        return null;
     }
-  }
-
-  return (
+    return (
     
     <SidebarProvider>
       <div className="flex flex-col min-h-screen bg-gray-50">
@@ -173,7 +253,7 @@ export default function AIAgentDashboard({onBack}) {
       Back
     </Button>
   </div>
-
+        
         <div className="flex flex-1">
         {/* Sidebar */}
         <Sidebar className="border-r">
@@ -188,7 +268,7 @@ export default function AIAgentDashboard({onBack}) {
                   {agents.map((agent) => (
                     <SidebarMenuItem key={agent.id}>
                       <SidebarMenuButton
-                        onClick={() => setSelectedAgent(agent)}
+                        onClick={() => {setSelectedAgent(agent);fetchDataForAgent(agent.id);}}
                         isActive={selectedAgent.id === agent.id}
                         className="w-full justify-start"
                       >
@@ -220,28 +300,24 @@ export default function AIAgentDashboard({onBack}) {
           <div className="p-6 space-y-6">
             {/* Dashboard Summary */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5" />
-                  Dashboard Summary - {selectedAgent.name}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">{selectedAgent.clientCount}</div>
-                    <div className="text-sm text-gray-500">Active Clients</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">94%</div>
-                    <div className="text-sm text-gray-500">Response Rate</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-600">$45K</div>
-                    <div className="text-sm text-gray-500">Total Revenue</div>
-                  </div>
-                </div>
-              </CardContent>
+                <CardHeader className="flex flex-col items-center justify-center">
+                    <CardTitle className="flex items-center gap-2 justify-center">
+                        <Activity className="h-5 w-5" />
+                        <span className="text-center">Dashboard Summary - {selectedAgent.name}</span>
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex justify-center gap-12">
+                        <div className="text-center">
+                            <div className="text-2xl font-bold text-blue-600">{selectedAgent.clientCount}</div>
+                            <div className="text-sm text-gray-500">Active Clients</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-2xl font-bold text-purple-600">{totalRevenue}$</div>
+                            <div className="text-sm text-gray-500">Total Revenue</div>
+                        </div>
+                    </div>
+                </CardContent>
             </Card>
 
             {/* KPI Cards */}
@@ -299,21 +375,26 @@ export default function AIAgentDashboard({onBack}) {
                 <CardContent>
                   <ResponsiveContainer width="100%" height={200}>
                     <ScatterChart data={transactionData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="x" />
-                      <YAxis dataKey="y" />
-                      <Tooltip
-                        formatter={(value, name) => {
-                          if (name === "y") return [`${((value) * 100).toFixed(1)}%`, "Tx Ratio"]
-                          return [value, name]
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="x" />
+                    <YAxis dataKey="y" />
+                    <Tooltip
+                        formatter={(value, name, props) => {
+                        if (name === "y") return [`${(value * 100).toFixed(1)}%`, "Tx Ratio"];
+                        return [value, name];
                         }}
-                        labelFormatter={(label) => `Client ${label}`}
-                      />
-                      <Scatter dataKey="y" fill="#8b5cf6">
+                        labelFormatter={(label, payload) => {
+                        if (payload && payload.length > 0) {
+                            return payload[0].payload.client;
+                        }
+                        return `Client ${label}`;
+                        }}
+                    />
+                    <Scatter dataKey="y" fill="#8b5cf6">
                         {transactionData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill="#8b5cf6" />
+                        <Cell key={`cell-${index}`} fill="#8b5cf6" />
                         ))}
-                      </Scatter>
+                    </Scatter>
                     </ScatterChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -382,7 +463,7 @@ export default function AIAgentDashboard({onBack}) {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5" />
-                  Timeline Graph + Message Explorer
+                  Timeline Graph of Most Active Client
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -398,16 +479,6 @@ export default function AIAgentDashboard({onBack}) {
                             className={cn(
                               "w-3 h-3 rounded-full",
                               item.sender === "agent" ? "bg-blue-500" : "bg-green-500",
-                            )}
-                          />
-                          <div
-                            className={cn(
-                              "w-2 h-2 rounded-full",
-                              item.type === "normal"
-                                ? "bg-gray-400"
-                                : item.type === "transaction"
-                                  ? "bg-yellow-500"
-                                  : "bg-red-500",
                             )}
                           />
                           <div className="flex-1">
@@ -438,18 +509,7 @@ export default function AIAgentDashboard({onBack}) {
                       <div className="w-3 h-3 rounded-full bg-green-500" />
                       <span>Client</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-gray-400" />
-                      <span>Normal</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                      <span>Transaction</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-red-500" />
-                      <span>Emotional</span>
-                    </div>
+                
                   </div>
                 </div>
               </CardContent>

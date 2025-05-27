@@ -1,6 +1,6 @@
 "use client"
 import { getCookie } from 'react-use-cookie';
-import { useState } from "react"
+import { use, useState } from "react"
 import { ArrowLeft,ArrowRight, ChevronDown, ChevronUp, SortAsc, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -12,22 +12,52 @@ import  { useEffect } from "react"
 import { filterProps } from 'framer-motion';
 import {useRef} from "react"
 import { cn } from "@/lib/utils"
+import { useApi } from "./ApiContext";
 
-export default function AiPromptingDashboard({onBack}) {
-  const [selectedClient, setSelectedClient] = useState("")
-  const [selectedAgent, setSelectedAgent] = useState("")
-  const [isContextOpen, setIsContextOpen] = useState(false);
-  const [clientSummary, setClientSummary] = useState("")
-  const [sortByImportance, setSortByImportance] = useState(false)
-  const [sortByDate, setSortByDate] = useState(false)
-  const [Clients, setClients] = useState([])
-  const [Agents, setAgents] = useState([])
-  const [sortedConversations, setSortedConversations] = useState([]);
-  const agentRef = useRef(0)
+export default function AiPromptingDashboard({ onBack }) {
+  const { getClients, getAgents, getConversations } = useApi();
+
+  const [selectedAgent, setSelectedAgent] = useState("");
+  const [selectedClient, setSelectedClient] = useState("");
+  const [Clients, setClients] = useState([]);
+  const [Agents, setAgents] = useState([]);
+  const [sortByDate, setSortByDate] = useState(false);
+  const [sortByImportance, setSortByImportance] = useState(false);
   const [clientSelectOpen, setClientSelectOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [response, setResponse] = useState("");
+  const [isContextOpen, setIsContextOpen] = useState(false);
+  const [sortedConversations, setSortedConversations] = useState([]);
+  const [clientSummary, setClientSummary] = useState("");
 
+  useEffect(() => {
+    getAgents().then(setAgents);
+  }, []);
+
+  useEffect(() => {
+    if (selectedAgent) {
+      getClients(selectedAgent).then(setClients);
+    }
+  }, [selectedAgent]);
+
+
+  useEffect(() => {
+    if (isContextOpen && selectedAgent && selectedClient) {
+      getConversations(selectedAgent, selectedClient).then(data => {
+        setSortedConversations(
+          data.sort((a, b) => {
+            if (!sortByDate) return 0;
+            return new Date(b.CreatedAt).getTime() - new Date(a.CreatedAt).getTime();
+          })
+        );
+      });
+    }
+  }, [selectedAgent, selectedClient, isContextOpen, sortByDate, getConversations]);
+
+  const sortedClients = [...Clients].sort((a, b) => {
+    if (!sortByImportance) return 0;
+    return (b.Score) - (a.Score);
+  });
 
   const handleGenerateResponse = () => {
     if (!clientSummary.trim()) return;
@@ -42,117 +72,6 @@ export default function AiPromptingDashboard({onBack}) {
       setResponse("Based on the client's tendencies, I recommend approaching them with a supportive tone. Focus on their key concerns about [topic] and emphasize how our solution addresses their specific needs around [pain point].");
     }, 2000);
   }
-
-
-
-  const getConversations = async () => {
-      if (!selectedAgent || !selectedClient) {
-        setSortedConversations([]); 
-        return;
-      }
-      const token = getCookie('token');
-      if (!token) {
-        return;
-      }
-      try {
-        const response = await fetch(
-          `/messages/agent/${selectedAgent}/client/${selectedClient}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await response.json();
-        console.log("Conversations data:", data);
-        const mappedConversations = data.map(msg => ({
-          id: msg.ID,
-          date: msg.CreatedAt,
-          title: msg.Title || "Message", 
-          summary: msg.Summary || msg.Content || "", 
-          type: msg.Type,
-        }));
-        
-        setSortedConversations(mappedConversations.sort((a, b) => {
-          if (!sortByDate) return 0;
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
-        }));
-      } catch (error) {
-        console.error("Error fetching conversations:", error);
-        setSortedConversations([]);
-      }
-    };
-
-    useEffect(() => { 
-      const token = getCookie('token');
-      if (!token) {
-        return;
-      }
- 
-      const getClients = async () => { 
-      try {
-        const agentId = selectedAgent || agentRef.current;
-    if (!agentId) return;
-
-        const response = await fetch(`/clients/agent/${agentId}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
-        });
-        
-        const data = await response.json(); 
-        const mappedClients = data.map(client => ({
-          id: client.ID, 
-          name: client.Name,
-          importance: client.Score 
-        }));
-        setClients(mappedClients);
-      } 
-      catch (error) {
-        console.error("Error making client request:", error);
-      }
-    };
-
-    const getAgents = async () => { 
-      try {
-        const response = await fetch("/agents", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
-        });
-        
-        const data = await response.json(); 
-        const mappedAgents = data.map(agent => ({
-          id: agent.ID,
-          date: agent.CreatedAt,
-          title: agent.Name,
-          summary: agent.Characteristics
-        }));
-        setAgents(mappedAgents);
-      } 
-      catch (error) {
-        console.error("Error making agent request:", error);
-      }
-    };
-  
-    getClients();
-    getAgents();
-    if (isContextOpen && selectedAgent && selectedClient) {
-      getConversations();
-    }
-
-  }, [selectedAgent, selectedClient,isContextOpen]);
-
-  const sortedClients = [...Clients].sort((a, b) => {
-  if (!sortByImportance) return 0;
-  return b.importance - a.importance;
-});
 
 
   return (
@@ -194,19 +113,19 @@ export default function AiPromptingDashboard({onBack}) {
                 </SelectTrigger>
                 <SelectContent>
                   {sortedClients.map((client) => (
-                    <SelectItem key={client.id} value={client.id.toString()}>
+                    <SelectItem key={client.ID} value={client.ID.toString()}>
                       <div className="flex items-center just</SelectItem>ify-between w-full">
-                        <span>{client.name}</span>
+                        <span>{client.Name}</span>
                         <Badge
                           variant={
-                            client.importance >= 5
+                            client.Score >= 5
                               ? "destructive"
-                              : client.importance >= 3
+                              : client.Score >= 3
                                 ? "default"
                                 : "secondary"
                           }
                         >
-                          {client.importance}
+                          {client.Score}
                         </Badge>
                       </div>
                     </SelectItem>
@@ -220,9 +139,9 @@ export default function AiPromptingDashboard({onBack}) {
                 </SelectTrigger>
                 <SelectContent>
                   {Agents.map((agent) => (
-                    <SelectItem key={agent.id} value={agent.id.toString()}>
+                    <SelectItem key={agent.ID} value={agent.ID.toString()}>
                       <div className="flex items-center justify-between w-full">
-                        <span>{agent.title}</span>
+                        <span>{agent.Name}</span>
                       </div>
                     </SelectItem>
                   ))}
@@ -274,11 +193,11 @@ export default function AiPromptingDashboard({onBack}) {
               <CollapsibleContent className="mt-4">
                 <div className="space-y-3">
                   {sortedConversations.map((conversation) => (
-                    <div key={conversation.id} className="border rounded-md p-3 bg-gray-50">
+                    <div key={conversation.ID} className="border rounded-md p-3 bg-gray-50">
                       <div className="flex justify-between items-center mb-1">
-                        <h4 className="font-medium">{conversation.title}</h4>
+                        <h4 className="font-medium">Message</h4>
                         <h4 className="font-medium flex items-center">
-                          {conversation.type === "CLIENT_TO_AGENT" ? (
+                          {conversation.Type === "CLIENT_TO_AGENT" ? (
                             <>
                               Client
                               <ArrowRight className="inline h-4 w-4 mx-1" />
@@ -293,10 +212,10 @@ export default function AiPromptingDashboard({onBack}) {
                           )}
                         </h4>
                         <span className="text-sm text-gray-500">
-                          {new Date(conversation.date).toLocaleDateString()}
+                          {new Date(conversation.CreatedAt).toLocaleDateString()}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600">{conversation.summary}</p>
+                      <p className="text-sm text-gray-600">{conversation.Content}</p>
                     </div>
                   ))}
                 </div>

@@ -22,6 +22,7 @@ import TeamPage from "../team/teamPage"
 import { AuthContext } from "../auth/auth-handler";
 import { getCookie } from 'react-use-cookie';
 import AIAgentDashboard from "../ai-prompting/performance-dashboard"
+import { ApiProvider } from "@/components/ai-prompting/ApiContext";
 
 export default function Dashboard() 
 {
@@ -145,27 +146,29 @@ export default function Dashboard()
             </BreadcrumbList>
           </Breadcrumb>
         </header>
+        <ApiProvider>
+          <div className="flex flex-1 flex-col gap-6 p-6 bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+            {
+              (pageState === possibleStates[0])
+                ? <IdleComponent />
+                : 
+                (pageState === possibleStates[1]) // pentru stable diffusion
+                ? <ImageGeneratorDashboard isLightThemed = {isLightThemed} onBack = {()=> setState(possibleStates[0])}/>
+                :
+                (pageState === possibleStates[2]) // pentru ai
+                ? <AiPromptingDashboard onBack = {()=> setState(possibleStates[0])}/>
+                :
+                (pageState === possibleStates[3]) // pentru team page
+                ? <TeamPage onBack = {()=> setState(possibleStates[0])}/>
+                :
+                (pageState === possibleStates[4]) // pentru Analytics
+                ? <AIAgentDashboard onBack = {()=> setState(possibleStates[0])}/>
+                :
+                <PlaceHolder />
+            }
+            </div>
+        </ApiProvider>
         
-        <div className="flex flex-1 flex-col gap-6 p-6 bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
-        {
-          (pageState === possibleStates[0])
-            ? <IdleComponent />
-            : 
-            (pageState === possibleStates[1]) // pentru stable diffusion
-            ? <ImageGeneratorDashboard isLightThemed = {isLightThemed} onBack = {()=> setState(possibleStates[0])}/>
-            :
-            (pageState === possibleStates[2]) // pentru ai
-            ? <AiPromptingDashboard onBack = {()=> setState(possibleStates[0])}/>
-            :
-            (pageState === possibleStates[3]) // pentru team page
-            ? <TeamPage onBack = {()=> setState(possibleStates[0])}/>
-            :
-            (pageState === possibleStates[4]) // pentru Analytics
-            ? <AIAgentDashboard onBack = {()=> setState(possibleStates[0])}/>
-            :
-            <PlaceHolder />
-        }
-        </div>
       </SidebarInset>
     </SidebarProvider>)
   );

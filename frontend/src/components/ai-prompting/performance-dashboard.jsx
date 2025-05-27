@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
+import { ArrowLeft } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -35,6 +36,10 @@ import {
 } from "@/components/ui/sidebar"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
+import { useEffect } from "react";
+
+import ApiContext from './ApiContext';
+import { useContext } from "react";
 
 // Mock data
 const agents = [
@@ -127,15 +132,22 @@ const timelineData = [
   { time: "10:30", sender: "client", type: "emotional", message: "Thank you so much for your help!" },
 ]
 
-export default function AIAgentDashboard() {
+export default function AIAgentDashboard({onBack}) {
   const [selectedAgent, setSelectedAgent] = useState(agents[0])
   const [expandedClient, setExpandedClient] = useState(null)
+  const { getClients, getAgents, getConversations } = useContext(ApiContext);
+
+    useEffect(() => { 
+         
+      }, []);
+
 
   const getScoreBadgeVariant = (score) => {
     if (score >= 80) return "default"
     if (score >= 60) return "secondary"
     return "destructive"
   }
+
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -151,8 +163,18 @@ export default function AIAgentDashboard() {
   }
 
   return (
+    
     <SidebarProvider>
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex flex-col min-h-screen bg-gray-50">
+        {/* Top slim rectangle */}
+      <div className="bg-white border-b px-4 py-2 flex items-center" onClick={onBack}>
+    <Button variant="ghost" className="mr-4">
+      <ArrowLeft className="h-5 w-5 mr-2" />
+      Back
+    </Button>
+  </div>
+
+        <div className="flex flex-1">
         {/* Sidebar */}
         <Sidebar className="border-r">
           <SidebarHeader className="p-4 border-b">
@@ -434,6 +456,8 @@ export default function AIAgentDashboard() {
             </Card>
           </div>
         </SidebarInset>
+       </div>                 
+
       </div>
     </SidebarProvider>
   )

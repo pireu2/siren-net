@@ -21,7 +21,7 @@ import { useState, useEffect, useContext } from 'react';
 import TeamPage from "../team/teamPage"
 import { AuthContext } from "../auth/auth-handler";
 import { getCookie } from 'react-use-cookie';
-
+import AIAgentDashboard from "../ai-prompting/performance-dashboard"
 
 export default function Dashboard() 
 {
@@ -159,6 +159,9 @@ export default function Dashboard()
             :
             (pageState === possibleStates[3]) // pentru team page
             ? <TeamPage onBack = {()=> setState(possibleStates[0])}/>
+            :
+            (pageState === possibleStates[4]) // pentru Analytics
+            ? <AIAgentDashboard onBack = {()=> setState(possibleStates[0])}/>
             :
             <PlaceHolder />
         }

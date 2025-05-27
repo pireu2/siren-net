@@ -33,6 +33,8 @@ export default function AiPromptingDashboard({onBack}) {
     if (!clientSummary.trim()) return;
     
     setIsGenerating(true);
+    getConversations();
+    
     setResponse(""); 
     
     setTimeout(() => {

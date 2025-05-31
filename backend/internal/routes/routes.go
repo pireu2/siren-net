@@ -73,3 +73,10 @@ func RegisterMessageRoutes(router *gin.Engine, h *handlers.MessageHandler, m *mi
 		messageGroup.DELETE("/:id", h.DeleteMessage)
 	}
 }
+
+func RegisterLLMRoutes(router *gin.Engine) {
+	llmGroup := router.Group("/llm")
+	{
+		llmGroup.POST("/ask", handlers.AskLLM)
+	}
+}

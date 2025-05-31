@@ -44,6 +44,7 @@ func New() *Application {
 	routes.RegisterClientRoutes(router, clientHandler, authMiddleware)
 	routes.RegisterTransactionRoutes(router, transactionHandler, authMiddleware)
 	routes.RegisterMessageRoutes(router, messageHandler, authMiddleware)
+	routes.RegisterLLMRoutes(router)
 
 	return &Application{
 		Router: router,

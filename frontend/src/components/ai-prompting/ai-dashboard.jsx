@@ -1,5 +1,9 @@
 "use client"
 import { getCookie } from 'react-use-cookie';
+import ReactMarkdown from 'react-markdown';
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 import { use, useState } from "react"
 import { ArrowLeft,ArrowRight, ChevronDown, ChevronUp, SortAsc, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -15,7 +19,7 @@ import { cn } from "@/lib/utils"
 import { useApi } from "./ApiContext";
 
 export default function AiPromptingDashboard({ onBack }) {
-  const { getClients, getAgents, getConversations } = useApi();
+  const { getClients, getAgents, getConversations,getDeepSeekResponse } = useApi();
 
   const [selectedAgent, setSelectedAgent] = useState("");
   const [selectedClient, setSelectedClient] = useState("");
@@ -31,6 +35,12 @@ export default function AiPromptingDashboard({ onBack }) {
   const [clientSummary, setClientSummary] = useState("");
 
   useEffect(() => {
+    if( response) {
+      console.log("Response changed:", response); 
+    }
+  }, [response]);
+
+  useEffect(() => {
     getAgents().then(setAgents);
   }, []);
 
@@ -40,17 +50,26 @@ export default function AiPromptingDashboard({ onBack }) {
     }
   }, [selectedAgent]);
 
+  const handleConvos = async () => {
+  if (selectedAgent && selectedClient) {
+    try {
+      const data = await getConversations(selectedAgent, selectedClient);
+      setSortedConversations(
+        data.sort((a, b) => {
+          if (!sortByDate) return 0;
+          return new Date(b.CreatedAt).getTime() - new Date(a.CreatedAt).getTime();
+        })
+      );
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+    }
+  }
+};
+
 
   useEffect(() => {
     if (isContextOpen && selectedAgent && selectedClient) {
-      getConversations(selectedAgent, selectedClient).then(data => {
-        setSortedConversations(
-          data.sort((a, b) => {
-            if (!sortByDate) return 0;
-            return new Date(b.CreatedAt).getTime() - new Date(a.CreatedAt).getTime();
-          })
-        );
-      });
+      handleConvos();
     }
   }, [selectedAgent, selectedClient, isContextOpen, sortByDate, getConversations]);
 
@@ -59,19 +78,33 @@ export default function AiPromptingDashboard({ onBack }) {
     return (b.Score) - (a.Score);
   });
 
-  const handleGenerateResponse = () => {
-    if (!clientSummary.trim()) return;
+  const handleGenerateResponse = async () => {
+  if (!clientSummary.trim()) return;
+  
+  setIsGenerating(true);
+  setResponse("");
+  
+  try {
+    const convosReturned = await getConversations(selectedAgent, selectedClient);
+    const convosContent = convosReturned.map((c) => ({
+      content: c.Content,
+      type: c.Type,
+    }));
+    const convos = convosContent.map((c) => {
+      const request = "Make the whole prompt markdown only!\n".concat((c.type === "CLIENT_TO_AGENT" ? "user" : "assistant").concat(": ", c.content));
+      return request;
+    }).join("\n");
     
-    setIsGenerating(true);
-    getConversations();
     
-    setResponse(""); 
-    
-    setTimeout(() => {
-      setIsGenerating(false);
-      setResponse("Based on the client's tendencies, I recommend approaching them with a supportive tone. Focus on their key concerns about [topic] and emphasize how our solution addresses their specific needs around [pain point].");
-    }, 2000);
+    getDeepSeekResponse(`${convos}\n\n${clientSummary}`).then((data) => {
+    setResponse(data.response);
+    setIsGenerating(false);
+  });
+  } catch (error) {
+    console.error("Error generating response:", error);
+    setIsGenerating(false);
   }
+}
 
 
   return (
@@ -241,7 +274,7 @@ export default function AiPromptingDashboard({ onBack }) {
                 size="lg"
                 className="w-3/4 h-12 text-lg"
                 onClick={handleGenerateResponse}
-                disabled={isGenerating || !clientSummary.trim()}
+                disabled={isGenerating || !clientSummary.trim() || !selectedAgent || !selectedClient}
               >
                 {isGenerating ? "Generating..." : "Generate Response"}
               </Button>
@@ -263,7 +296,8 @@ export default function AiPromptingDashboard({ onBack }) {
       </div>
     ) : response ? (
       <div className="p-4 border rounded-md">
-        <p className="text-gray-700">{response}</p>
+        <ReactMarkdown remarkPlugins={[remarkMath]}
+        rehypePlugins={[rehypeKatex]}>{response}</ReactMarkdown>
       </div>
     ) : (
       <div className="p-4 border border-dashed rounded-md text-center text-gray-500">

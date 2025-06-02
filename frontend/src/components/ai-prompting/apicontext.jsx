@@ -59,6 +59,25 @@ export function ApiProvider({ children }) {
     }
   };
 
+
+  const getDeepSeekResponse = async (promptText) => {
+    try {
+      const response = await fetch(
+        `/llm/ask`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            prompt: promptText
+          }),
+        }
+      );
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+      return [];
+    }
+  };
+
   const getTransactions = async (agentId, clientId) => {
   if (!agentId || !clientId) return [];
   
@@ -100,7 +119,7 @@ export function ApiProvider({ children }) {
   
 
   return (
-    <ApiContext.Provider value={{ getClients, getAgents, getConversations, getTransactions }}>
+    <ApiContext.Provider value={{ getClients, getAgents, getConversations, getTransactions,getDeepSeekResponse }}>
       {children}
     </ApiContext.Provider>
   );

@@ -15,6 +15,6 @@ func Load() Config {
 	return Config{
 		DatabaseURL: os.Getenv("DATABASE_URL"),
 		JWTSecret:   os.Getenv("JWT_SECRET"),
-		TokenExpiry: time.Second * 10,
+		TokenExpiry: time.Second * 3600,
 	}
 }

@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
+const link = "26.78.62.195"
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(),tailwindcss(),],
@@ -40,6 +41,11 @@ export default defineConfig({
       },
       "/transactions": {
         target: "http://localhost:8080", 
+        changeOrigin: true,
+        secure: false,
+      },
+      "/llm": {
+        target: `http://${link}:8080`, 
         changeOrigin: true,
         secure: false,
       },

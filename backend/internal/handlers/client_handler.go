@@ -61,6 +61,7 @@ func (h *ClientHandler) GetClientsByAgentID(c *gin.Context) {
 	}
 
 	agentID, err := strconv.ParseUint(agentIDParam, 10, 32)
+
 	if err != nil {
 		services.RespondError(c, http.StatusBadRequest, services.ErrInvalidAgentID)
 		return

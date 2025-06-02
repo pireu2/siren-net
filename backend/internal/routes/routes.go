@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"backend/internal/config"
 	"backend/internal/handlers"
 	"backend/internal/middleware"
 
@@ -78,5 +79,14 @@ func RegisterLLMRoutes(router *gin.Engine) {
 	llmGroup := router.Group("/llm")
 	{
 		llmGroup.POST("/ask", handlers.AskLLM)
+	}
+}
+
+func RegisterSDRoutes(router *gin.Engine, cfg *config.Config) {
+	sdGroup := router.Group("/sd")
+	{
+		sdGroup.POST("/generate", func(c *gin.Context) {
+			handlers.TextToImage(c, cfg)
+		})
 	}
 }

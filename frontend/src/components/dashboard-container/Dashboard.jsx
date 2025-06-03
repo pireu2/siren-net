@@ -52,33 +52,33 @@ export default function Dashboard()
   }, [pageState, isLightThemed]);
 
 
-  // useEffect(() => { 
-  //     const makeProtectedRequest = async () => { 
-  //     const token = getCookie('token');
-  //     if (!token) {
-  //       return;
-  //     }
+  useEffect(() => { 
+      const makeProtectedRequest = async () => { 
+      const token = getCookie('token');
+      if (!token) {
+        return;
+      }
     
-  //     try {
-  //       const response = await fetch("protected/", {
-  //         method: "GET",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           "Authorization": `Bearer ${token}`,
-  //         },
-  //       });
+      try {
+        const response = await fetch("protected/", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+        });
         
-  //       const data = await response.json(); 
-  //       if(data.error)
-  //       {
-  //         logout();
-  //       }
-  //     } catch (error) {
-  //       console.error("Error making protected request:", error);
-  //     }
-  //   };
-  //   makeProtectedRequest();
-  //   }, []);
+        const data = await response.json(); 
+        if(data.error)
+        {
+          logout();
+        }
+      } catch (error) {
+        console.error("Error making protected request:", error);
+      }
+    };
+    makeProtectedRequest();
+    }, []);
   
 
   function changeState(key)

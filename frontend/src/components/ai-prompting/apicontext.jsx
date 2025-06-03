@@ -78,6 +78,25 @@ export function ApiProvider({ children }) {
     }
   };
 
+
+  const getStableDiffusionImage = async (promptText) => {
+    try {
+      const response = await fetch(
+        `/sd/generate`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            prompt: promptText
+          }),
+        }
+      );
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+      return [];
+    }
+  };
+
   const getTransactions = async (agentId, clientId) => {
   if (!agentId || !clientId) return [];
   
@@ -98,17 +117,7 @@ export function ApiProvider({ children }) {
       console.error(`Transaction API error: ${response.status} ${response.statusText}`);
       return [];
     }
-    
-    // Try to parse as JSON safely
-    const contentType = response.headers.get("content-type");
-    if (contentType && contentType.includes("application/json")) {
-      return await response.json();
-    } else {
-      // If not JSON, log the issue
-      const text = await response.text();
-      console.error("API returned non-JSON response:", text.substring(0, 100) + "...");
-      return [];
-    }
+    return await response.json();
   } catch (error) {
     console.error("Error fetching transactions:", error);
     return [];
@@ -119,7 +128,7 @@ export function ApiProvider({ children }) {
   
 
   return (
-    <ApiContext.Provider value={{ getClients, getAgents, getConversations, getTransactions,getDeepSeekResponse }}>
+    <ApiContext.Provider value={{ getClients, getAgents, getConversations, getTransactions,getDeepSeekResponse,getStableDiffusionImage }}>
       {children}
     </ApiContext.Provider>
   );

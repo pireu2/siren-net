@@ -49,6 +49,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      "/sd": {
+        target: `http://${link}:8080`, 
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 })
